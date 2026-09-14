@@ -69,8 +69,28 @@ var patient_zero_selected: bool = false
 # Country runtime states: id -> dict
 var country_states: Dictionary = {}
 
+func _enter_tree():
+	_apply_omarchy_font()
+
 func _ready():
 	pass
+
+func _apply_omarchy_font():
+	var font_path = ""
+	var out = []
+	var exit_code = OS.execute("fc-match", ["monospace:style=Regular", "-f", "%{file}\n"], out, true)
+	if exit_code == 0 and not out.is_empty():
+		font_path = out[0].strip_edges()
+	if font_path == "" or not FileAccess.file_exists(font_path):
+		font_path = "/usr/share/fonts/Adwaita/AdwaitaMono-Regular.ttf"
+	
+	if FileAccess.file_exists(font_path):
+		var font = FontFile.new()
+		var err = font.load_dynamic_font(font_path)
+		if err == OK:
+			ThemeDB.get_default_theme().default_font = font
+			ThemeDB.fallback_font = font
+			print("GameState: loaded Omarchy font: ", font_path)
 
 func setup_new_game(p_name: String, p_type: String, p_diff: String):
 	disease_name = p_name if p_name.strip_edges() != "" else "Omaplague"

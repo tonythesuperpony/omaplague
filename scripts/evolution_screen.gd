@@ -3,14 +3,14 @@ extends CanvasLayer
 signal back_requested()
 
 @onready var root_control: Control = $Root
-@onready var tab_trans: Button = $Root/VBox/TopBar/HBox/TabTrans
-@onready var tab_symp: Button = $Root/VBox/TopBar/HBox/TabSymp
-@onready var tab_abil: Button = $Root/VBox/TopBar/HBox/TabAbil
-@onready var btn_back: Button = $Root/VBox/TopBar/HBox/BtnBack
-@onready var btn_back_bottom: Button = $Root/VBox/BottomMeters/HBox/BtnBackBottom
-@onready var dna_label: Label = $Root/VBox/TopBar/HBox/DnaLabel
+@onready var tab_trans: Button = $Root/VBox/TopBar/Margin/HBox/TabRow/TabTrans
+@onready var tab_symp: Button = $Root/VBox/TopBar/Margin/HBox/TabRow/TabSymp
+@onready var tab_abil: Button = $Root/VBox/TopBar/Margin/HBox/TabRow/TabAbil
+@onready var btn_back: Button = $Root/VBox/TopBar/Margin/HBox/BtnBack
+@onready var dna_label: Label = $Root/VBox/TopBar/Margin/HBox/DnaLabel
 
-@onready var tree_canvas: Control = $Root/VBox/MainArea/TreeCanvas
+@onready var scroll_container: ScrollContainer = $Root/VBox/MainArea/ScrollContainer
+@onready var tree_canvas: Control = $Root/VBox/MainArea/ScrollContainer/TreeCanvas
 
 # Details panel
 @onready var detail_name: Label = $Root/VBox/MainArea/DetailsPanel/Margin/VBox/NameLabel
@@ -27,7 +27,6 @@ signal back_requested()
 
 var current_category: String = "transmission"
 var selected_upgrade_id: String = ""
-
 var upgrade_buttons: Dictionary = {}
 
 func _ready():
@@ -36,8 +35,6 @@ func _ready():
 	tab_abil.pressed.connect(func(): _switch_tab("ability"))
 	
 	btn_back.pressed.connect(close)
-	btn_back_bottom.pressed.connect(close)
-	
 	btn_evolve.pressed.connect(_on_evolve_pressed)
 	btn_devolve.pressed.connect(_on_devolve_pressed)
 	
@@ -65,9 +62,15 @@ func _switch_tab(cat: String):
 	current_category = cat
 	selected_upgrade_id = ""
 	
-	tab_trans.modulate = Color(1.2, 1.2, 1.2) if cat == "transmission" else Color(0.7, 0.7, 0.7)
-	tab_symp.modulate = Color(1.2, 1.2, 1.2) if cat == "symptom" else Color(0.7, 0.7, 0.7)
-	tab_abil.modulate = Color(1.2, 1.2, 1.2) if cat == "ability" else Color(0.7, 0.7, 0.7)
+	# Highlight active tab
+	for tab in [tab_trans, tab_symp, tab_abil]:
+		tab.modulate = Color(1.0, 1.0, 1.0, 1.0)
+		tab.add_theme_color_override("font_color", Color(0.6, 0.7, 0.8, 0.75))
+	var active_tab = tab_trans
+	if cat == "symptom": active_tab = tab_symp
+	elif cat == "ability": active_tab = tab_abil
+	active_tab.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	active_tab.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1.0))
 	
 	_rebuild_tree()
 	_refresh_ui()
@@ -81,19 +84,24 @@ func _rebuild_tree():
 	for u in DataManager.upgrades:
 		if u.get("category") == current_category:
 			cat_upgrades.append(u)
-			
-	var grid_origin = Vector2(80, 50)
-	var cell_size = Vector2(170, 90)
+	
+	var grid_origin = Vector2(60, 40)
+	var cell_size = Vector2(175, 95)
+	
+	# Track canvas extent
+	var max_x = 0.0
+	var max_y = 0.0
 	
 	for u in cat_upgrades:
 		var grid = u.get("grid", [0, 0])
 		var pos = grid_origin + Vector2(grid[1] * cell_size.x, grid[0] * cell_size.y)
 		
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(140, 60)
+		btn.custom_minimum_size = Vector2(148, 68)
 		btn.position = pos
 		btn.text = "%s\n%d DNA" % [u["name"], u["cost"]]
-		btn.add_theme_font_size_override("font_size", 13)
+		btn.add_theme_font_size_override("font_size", 12)
+		btn.tooltip_text = u.get("description", "")
 		
 		var uid = u["id"]
 		btn.pressed.connect(func(): _select_upgrade(uid))
@@ -101,6 +109,11 @@ func _rebuild_tree():
 		tree_canvas.add_child(btn)
 		upgrade_buttons[uid] = btn
 		
+		max_x = max(max_x, pos.x + 160)
+		max_y = max(max_y, pos.y + 90)
+	
+	# Expand scroll canvas to fit content
+	tree_canvas.custom_minimum_size = Vector2(max_x + 40, max_y + 40)
 	tree_canvas.queue_redraw()
 
 func _select_upgrade(uid: String):
@@ -112,7 +125,7 @@ func _refresh_ui():
 	if not visible:
 		return
 		
-	dna_label.text = "DNA Points: %d" % GameState.dna_points
+	dna_label.text = "🧬 %d DNA" % GameState.dna_points
 	
 	# Update Meters
 	bar_inf.value = clamp(GameState.current_infectivity * 100.0, 0.0, 100.0)
@@ -132,17 +145,21 @@ func _refresh_ui():
 				break
 				
 		if is_evolved:
-			btn.text = "%s\n[EVOLVED]" % u["name"]
-			btn.modulate = Color(1.0, 0.35, 0.35)
+			btn.text = "%s\n✓ EVOLVED" % u["name"]
+			btn.modulate = Color(1.0, 0.38, 0.38)
 		elif can_evolve:
 			btn.text = "%s\n%d DNA" % [u["name"], u["cost"]]
 			if GameState.dna_points >= u["cost"]:
-				btn.modulate = Color(0.4, 1.0, 0.4)
+				btn.modulate = Color(0.45, 1.0, 0.45)
 			else:
-				btn.modulate = Color(1.0, 0.85, 0.3)
+				btn.modulate = Color(1.0, 0.88, 0.3)
 		else:
-			btn.text = "%s\n[LOCKED]" % u["name"]
-			btn.modulate = Color(0.4, 0.45, 0.5)
+			btn.text = "%s\n🔒 LOCKED" % u["name"]
+			btn.modulate = Color(0.38, 0.44, 0.5)
+			
+		# Highlight selected
+		if uid == selected_upgrade_id:
+			btn.modulate = btn.modulate * 1.3
 			
 	tree_canvas.queue_redraw()
 	_refresh_details()
@@ -151,7 +168,7 @@ func _refresh_details():
 	if selected_upgrade_id == "":
 		detail_name.text = "SELECT A MUTATION"
 		detail_cost.text = ""
-		detail_desc.text = "Select any trait node from the tree to view its bio-stats and evolve it."
+		detail_desc.text = "Tap any trait node in the tree to inspect and evolve it.\nGreen = affordable  •  Yellow = insufficient DNA  •  Gray = locked"
 		detail_stats.text = ""
 		btn_evolve.disabled = true
 		btn_devolve.disabled = true
@@ -162,17 +179,28 @@ func _refresh_details():
 		return
 		
 	detail_name.text = u.get("name", "").to_upper()
-	detail_cost.text = "Cost: %d DNA" % u.get("cost", 0)
+	
+	var cost = u.get("cost", 0)
+	detail_cost.text = "Cost: %d DNA  (Available: %d)" % [cost, GameState.dna_points]
 	detail_desc.text = u.get("description", "")
 	
-	var stat_str = "Stats: "
+	var stat_parts = []
 	if u.get("infectivity", 0.0) > 0:
-		stat_str += "+%d%% Infectivity  " % int(u["infectivity"] * 100.0)
+		stat_parts.append("+%d%% Infectivity" % int(u["infectivity"] * 100.0))
 	if u.get("severity", 0.0) > 0:
-		stat_str += "+%d%% Severity  " % int(u["severity"] * 100.0)
+		stat_parts.append("+%d%% Severity" % int(u["severity"] * 100.0))
 	if u.get("lethality", 0.0) > 0:
-		stat_str += "+%d%% Lethality  " % int(u["lethality"] * 100.0)
-	detail_stats.text = stat_str
+		stat_parts.append("+%d%% Lethality" % int(u["lethality"] * 100.0))
+	if u.get("cure_resist", 0.0) > 0:
+		stat_parts.append("-%d%% Cure Speed" % int(u["cure_resist"] * 100.0))
+	var mods = u.get("modifiers", {})
+	if mods.get("air", 0.0) > 0:
+		stat_parts.append("+%.0f%% Air" % (mods["air"] * 100.0 - 100.0))
+	if mods.get("sea", 0.0) > 0:
+		stat_parts.append("+%.0f%% Sea" % (mods["sea"] * 100.0 - 100.0))
+	if mods.get("land", 0.0) > 0:
+		stat_parts.append("+%.0f%% Land" % (mods["land"] * 100.0 - 100.0))
+	detail_stats.text = "  •  ".join(stat_parts) if stat_parts else "No direct stat changes"
 	
 	var is_evolved = GameState.purchased_upgrades.has(selected_upgrade_id)
 	var can_evolve = true
@@ -184,7 +212,14 @@ func _refresh_details():
 	btn_evolve.visible = not is_evolved
 	btn_devolve.visible = is_evolved
 	
-	btn_evolve.disabled = not (can_evolve and GameState.dna_points >= u.get("cost", 0))
+	var affordable = GameState.dna_points >= cost
+	btn_evolve.disabled = not (can_evolve and affordable)
+	if not can_evolve:
+		btn_evolve.text = "🔒 PREREQUISITES NOT MET"
+	elif not affordable:
+		btn_evolve.text = "❌ NOT ENOUGH DNA (%d/%d)" % [GameState.dna_points, cost]
+	else:
+		btn_evolve.text = "⚡ EVOLVE (%d DNA)" % cost
 	btn_devolve.disabled = not is_evolved
 
 func _on_evolve_pressed():
@@ -208,7 +243,18 @@ func _on_tree_canvas_draw():
 				var pbtn = upgrade_buttons[pid]
 				var pcenter = pbtn.position + pbtn.custom_minimum_size * 0.5
 				
-				var is_connected = GameState.purchased_upgrades.has(pid)
-				var line_col = Color(0.9, 0.3, 0.3, 0.8) if is_connected else Color(0.25, 0.35, 0.45, 0.5)
-				var line_w = 2.5 if is_connected else 1.5
+				var is_parent_evolved = GameState.purchased_upgrades.has(pid)
+				var is_child_evolved = GameState.purchased_upgrades.has(uid)
+				
+				var line_col: Color
+				var line_w: float
+				if is_parent_evolved and is_child_evolved:
+					line_col = Color(1.0, 0.35, 0.35, 0.9)
+					line_w = 2.5
+				elif is_parent_evolved:
+					line_col = Color(0.45, 1.0, 0.5, 0.7)
+					line_w = 2.0
+				else:
+					line_col = Color(0.25, 0.32, 0.42, 0.45)
+					line_w = 1.5
 				tree_canvas.draw_line(pcenter, btn_center, line_col, line_w)

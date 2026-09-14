@@ -227,7 +227,8 @@ func _input(event: InputEvent):
 			_zoom_at(event.position, 0.87)
 			
 		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			_handle_left_click(event.position)
+			if not event.is_echo():
+				_handle_left_click(event.position)
 			
 	elif event is InputEventMouseMotion:
 		if is_dragging:
@@ -257,6 +258,12 @@ func _clamp_position():
 	position.y = clamp(position.y, min(p_min_y, p_max_y), max(p_min_y, p_max_y))
 
 func _handle_mouse_hover(screen_pos: Vector2):
+	if not is_interactive:
+		if hovered_country_id != "":
+			hovered_country_id = ""
+			country_unhovered.emit()
+			queue_redraw()
+		return
 	var world_p = (screen_pos - position) / zoom_level
 	var cid = _get_country_at_pos(world_p)
 	if cid != hovered_country_id:
@@ -271,6 +278,19 @@ func _handle_mouse_hover(screen_pos: Vector2):
 
 func _handle_left_click(screen_pos: Vector2):
 	var world_p = (screen_pos - position) / zoom_level
+	
+	# PRIORITY: check if click hits any bubble first (in world space)
+	# Bubbles have a collision radius of ~34px in sprite space, scaled by their current scale (~0.7)
+	# So effective world-space radius ≈ 34 * 0.7 = ~24px — use 30 for generous hit area
+	for bubble in bubbles_node.get_children():
+		if not bubble.is_queued_for_deletion():
+			var dist = world_p.distance_to(bubble.position)
+			# Use a generous hit radius (bubble scale * 34 collision radius)
+			var hit_radius = 34.0 * bubble.scale.x + 8.0
+			if dist <= hit_radius:
+				bubble.pop()
+				return  # Consumed by bubble — don't process country click
+	
 	var cid = _get_country_at_pos(world_p)
 	if cid != "":
 		if not GameState.patient_zero_selected:
@@ -293,6 +313,11 @@ func _get_country_at_pos(p: Vector2) -> String:
 	return ""
 
 func _draw():
+	# 0. Fill beyond-map area with matching ocean dark color (prevents gray border when zoomed out)
+	var vp_size = get_viewport_rect().size
+	# Draw extra large covering rect in local space (map transform applied by parent)
+	draw_rect(Rect2(-2000, -2000, 6000, 5000), Color(0.04, 0.07, 0.12, 1.0))
+	
 	# 1. Base Map: Realistic NASA Satellite Terrain
 	if map_texture:
 		draw_texture_rect(map_texture, Rect2(0, 0, MAP_WIDTH, MAP_HEIGHT), false)

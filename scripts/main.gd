@@ -10,6 +10,12 @@ extends Node
 var sim_timer: float = 0.0
 
 func _ready():
+	# Set ocean-matching background clear color (eliminates gray on zoom out)
+	RenderingServer.set_default_clear_color(Color(0.04, 0.07, 0.12, 1.0))
+	
+	# Apply the current Omarchy/system font dynamically
+	_apply_system_font()
+	
 	world_map.country_selected.connect(_on_country_selected)
 	world_map.country_hovered.connect(_on_country_hovered)
 	world_map.country_unhovered.connect(_on_country_unhovered)
@@ -78,3 +84,51 @@ func _on_restart_requested():
 	hud.hide_hover_info()
 	world_map.set_interactive(false)
 	setup_screen.show()
+
+# ─── Omarchy System Font Integration ──────────────────────────────
+# Resolves the current Omarchy monospace font (via fontconfig/omarchy font current)
+# and applies it to ThemeDB.get_default_theme().default_font and ThemeDB.fallback_font.
+func _apply_system_font():
+	var font_path = _resolve_system_font_path()
+	if font_path == "" or not FileAccess.file_exists(font_path):
+		font_path = "/usr/share/fonts/Adwaita/AdwaitaMono-Regular.ttf"
+	
+	if not FileAccess.file_exists(font_path):
+		push_warning("Omaplague: system font not found at: %s" % font_path)
+		return
+	
+	var font = FontFile.new()
+	var err = font.load_dynamic_font(font_path)
+	if err != OK:
+		push_warning("Omaplague: failed to load font: %s" % font_path)
+		return
+	
+	ThemeDB.get_default_theme().default_font = font
+	ThemeDB.fallback_font = font
+	ThemeDB.fallback_font_size = 14
+	
+	var theme = Theme.new()
+	theme.default_font = font
+	theme.default_font_size = 14
+	get_tree().root.theme = theme
+	print("Omaplague: active Omarchy font applied -> %s" % font_path)
+
+func _resolve_system_font_path() -> String:
+	# Omarchy canonical source of truth is fontconfig 'monospace' (set by omarchy font set)
+	var fcmatch_out = []
+	var exit = OS.execute("fc-match", ["monospace:style=Regular", "-f", "%{file}\n"], fcmatch_out, true)
+	if exit == 0 and not fcmatch_out.is_empty():
+		var resolved = fcmatch_out[0].strip_edges()
+		if FileAccess.file_exists(resolved):
+			return resolved
+	
+	# Fallback check for omarchy font list standard locations
+	var candidates = [
+		"/usr/share/fonts/Adwaita/AdwaitaMono-Regular.ttf",
+		"/usr/share/fonts/TTF/JetBrainsMonoNerdFont-Regular.ttf",
+		"/usr/share/fonts/liberation/LiberationMono-Regular.ttf"
+	]
+	for c in candidates:
+		if FileAccess.file_exists(c):
+			return c
+	return ""

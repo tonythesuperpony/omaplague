@@ -1,151 +1,395 @@
-[gd_scene load_steps=5 format=3 uid="uid://csetupscene123"]
+[gd_scene load_steps=10 format=3 uid="uid://csetupscene123"]
 
 [ext_resource type="Script" path="res://scripts/setup_screen.gd" id="1_setup"]
-[ext_resource type="Texture2D" path="res://assets/icons/biohazard.png" id="2_bio"]
+[ext_resource type="Script" path="res://scripts/cracktro_canvas.gd" id="2_canvas"]
+[ext_resource type="Texture2D" path="res://assets/cracktro_emblem_glow.png" id="3_emblem"]
+[ext_resource type="Texture2D" path="res://assets/cracktro_wordmark.png" id="4_wordmark"]
+[ext_resource type="Texture2D" path="res://assets/icons/biohazard.png" id="5_bio"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
-bg_color = Color(0.04, 0.06, 0.1, 0.98)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ticker"]
+bg_color = Color(0.07, 0.0, 0.0, 0.85)
+border_width_top = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.07, 0.07, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_box"]
-bg_color = Color(0.06, 0.09, 0.15, 0.9)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_setup_panel"]
+bg_color = Color(0.04, 0.06, 0.1, 0.96)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.2, 0.3, 0.45, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+border_color = Color(0.8, 0.18, 0.18, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_intro"]
+bg_color = Color(0.2, 0.05, 0.05, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7, 0.2, 0.2, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_start_btn"]
+bg_color = Color(0.75, 0.12, 0.12, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.4, 0.4, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="SetupScreen" type="CanvasLayer"]
 layer = 15
 script = ExtResource("1_setup")
 
-[node name="BG" type="Panel" parent="."]
-layout_mode = 1
+[node name="CracktroCanvas" type="Control" parent="."]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+mouse_filter = 2
+script = ExtResource("2_canvas")
 
-[node name="Panel" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(800, 620)
+[node name="CracktroUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CenterTop" type="Label" parent="CracktroUI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 26.0
+offset_bottom = 44.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.88, 0.18, 0.18, 1)
+theme_override_colors/font_shadow_color = Color(0.6, 0, 0, 0.8)
+theme_override_font_sizes/font_size = 13
+text = "*** OMAPLAGUE SOFTWARE PRESENTS ***"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="CracktroUI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 46.0
+offset_bottom = 62.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0.55, 0.12, 0.12, 1)
+theme_override_font_sizes/font_size = 10
+text = "A NEW PLAGUE IS BORN // NFO RELEASE"
+horizontal_alignment = 1
+
+[node name="TopLeft" type="Label" parent="CracktroUI"]
+layout_mode = 1
+offset_left = 24.0
+offset_top = 20.0
+offset_right = 220.0
+offset_bottom = 60.0
+theme_override_colors/font_color = Color(0.78, 0.18, 0.18, 1)
+theme_override_colors/font_shadow_color = Color(0.5, 0, 0, 0.6)
+theme_override_font_sizes/font_size = 11
+text = "OMAPLAGUE.EXE
+NFO // 199X RELEASE"
+
+[node name="TopRight" type="Label" parent="CracktroUI"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 60.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.78, 0.18, 0.18, 1)
+theme_override_colors/font_shadow_color = Color(0.5, 0, 0, 0.6)
+theme_override_font_sizes/font_size = 11
+text = "VGA 256 COLOR
+640K SYSTEM READY"
+horizontal_alignment = 2
+
+[node name="BottomLeft" type="Label" parent="CracktroUI"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -42.0
+offset_right = 280.0
+offset_bottom = -16.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.68, 0.15, 0.15, 1)
+theme_override_font_sizes/font_size = 11
+text = "BIOHAZARD NETWORK // ONLINE"
+
+[node name="BottomRight" type="Label" parent="CracktroUI"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -280.0
+offset_top = -42.0
+offset_right = -24.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.68, 0.15, 0.15, 1)
+theme_override_font_sizes/font_size = 11
+text = "BUILD 01.000 // STATUS: INFECTED"
+horizontal_alignment = 2
+
+[node name="Emblem" type="TextureRect" parent="CracktroUI"]
+custom_minimum_size = Vector2(300, 300)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
+offset_left = -150.0
+offset_top = -205.0
+offset_right = 150.0
+offset_bottom = 95.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(150, 150)
+texture = ExtResource("3_emblem")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Wordmark" type="TextureRect" parent="CracktroUI"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = 100.0
+offset_right = 250.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(250, 50)
+texture = ExtResource("4_wordmark")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TickerBar" type="Panel" parent="CracktroUI"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -98.0
+offset_bottom = -72.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ticker")
+
+[node name="TickerLabel" type="Label" parent="CracktroUI/TickerBar"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 2400.0
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.85, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 12
+text = "[ OMAPLAGUE ] //// INFECT • EVOLVE • DOMINATE //// NO CURE // NO ESCAPE //// THE WORLD IS YOUR PETRI DISH //// PRESS ANY KEY //// OMAPLAGUE v1.0 //// CRACKED BY OMARCHY CREW ////"
+vertical_alignment = 1
+
+[node name="PromptLabel" type="Label" parent="CracktroUI"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -68.0
+offset_bottom = -46.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_shadow_color = Color(0.8, 0.1, 0.1, 0.8)
+theme_override_font_sizes/font_size = 13
+text = "[ PRESS ANY KEY OR CLICK TO CONTINUE ]"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SetupUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="SetupUI"]
+custom_minimum_size = Vector2(840, 620)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -420.0
 offset_top = -310.0
-offset_right = 400.0
+offset_right = 420.0
 offset_bottom = 310.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_box")
+theme_override_styles/panel = SubResource("StyleBoxFlat_setup_panel")
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Margin" type="MarginContainer" parent="SetupUI/Panel"]
 layout_mode = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 20
 
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="SetupUI/Panel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 14
 
-[node name="HeaderHBox" type="HBoxContainer" parent="Panel/Margin/VBox"]
+[node name="HeaderHBox" type="HBoxContainer" parent="SetupUI/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
+theme_override_constants/separation = 14
 
-[node name="TextureRect" type="TextureRect" parent="Panel/Margin/VBox/HeaderHBox"]
-custom_minimum_size = Vector2(48, 48)
+[node name="TextureRect" type="TextureRect" parent="SetupUI/Panel/Margin/VBox/HeaderHBox"]
+custom_minimum_size = Vector2(40, 40)
 layout_mode = 2
-texture = ExtResource("2_bio")
+size_flags_vertical = 4
+texture = ExtResource("5_bio")
 expand_mode = 1
 
-[node name="TitleLabel" type="Label" parent="Panel/Margin/VBox/HeaderHBox"]
+[node name="VBox" type="VBoxContainer" parent="SetupUI/Panel/Margin/VBox/HeaderHBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
-theme_override_font_sizes/font_size = 32
-text = "OMAPLAGUE"
+size_flags_horizontal = 3
 
-[node name="HSeparator" type="HSeparator" parent="Panel/Margin/VBox"]
+[node name="TitleLabel" type="Label" parent="SetupUI/Panel/Margin/VBox/HeaderHBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.28, 0.28, 1)
+theme_override_font_sizes/font_size = 22
+text = "☣ OMAPLAGUE // SYSTEM CONFIGURATION"
+
+[node name="SubLabel" type="Label" parent="SetupUI/Panel/Margin/VBox/HeaderHBox/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "SELECT PATHOGEN PROFILE & GLOBAL THREAT LEVEL"
+
+[node name="BtnIntro" type="Button" parent="SetupUI/Panel/Margin/VBox/HeaderHBox"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_intro")
+theme_override_font_sizes/font_size = 12
+text = "← DEMO INTRO"
+
+[node name="HSeparator" type="HSeparator" parent="SetupUI/Panel/Margin/VBox"]
 layout_mode = 2
 
-[node name="NameBox" type="VBoxContainer" parent="Panel/Margin/VBox"]
+[node name="NameBox" type="VBoxContainer" parent="SetupUI/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="Label" type="Label" parent="Panel/Margin/VBox/NameBox"]
+[node name="Label" type="Label" parent="SetupUI/Panel/Margin/VBox/NameBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "PATHOGEN DESIGNATION:"
+
+[node name="LineEdit" type="LineEdit" parent="SetupUI/Panel/Margin/VBox/NameBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
 theme_override_font_sizes/font_size = 15
-text = "DISEASE NAME:"
-
-[node name="LineEdit" type="LineEdit" parent="Panel/Margin/VBox/NameBox"]
-custom_minimum_size = Vector2(0, 42)
-layout_mode = 2
-theme_override_font_sizes/font_size = 16
 text = "Omaplague"
 placeholder_text = "Enter pathogen name..."
 
-[node name="TypeBox" type="VBoxContainer" parent="Panel/Margin/VBox"]
+[node name="TypeBox" type="VBoxContainer" parent="SetupUI/Panel/Margin/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
-[node name="Label" type="Label" parent="Panel/Margin/VBox/TypeBox"]
+[node name="Label" type="Label" parent="SetupUI/Panel/Margin/VBox/TypeBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
-theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 14
 text = "CHOOSE PATHOGEN TYPE:"
 
-[node name="TypeHBox" type="HBoxContainer" parent="Panel/Margin/VBox/TypeBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="TypeDesc" type="Label" parent="Panel/Margin/VBox/TypeBox"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.75, 0.85, 1)
-theme_override_font_sizes/font_size = 13
-text = "Description of selected disease type..."
-autowrap_mode = 2
-
-[node name="DiffBox" type="VBoxContainer" parent="Panel/Margin/VBox"]
+[node name="TypeHBox" type="HBoxContainer" parent="SetupUI/Panel/Margin/VBox/TypeBox"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Label" type="Label" parent="Panel/Margin/VBox/DiffBox"]
+[node name="TypeDesc" type="Label" parent="SetupUI/Panel/Margin/VBox/TypeBox"]
+custom_minimum_size = Vector2(0, 48)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
-theme_override_font_sizes/font_size = 15
-text = "CHOOSE DIFFICULTY:"
-
-[node name="DiffHBox" type="HBoxContainer" parent="Panel/Margin/VBox/DiffBox"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="DiffDesc" type="Label" parent="Panel/Margin/VBox/DiffBox"]
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.75, 0.85, 1)
-theme_override_font_sizes/font_size = 13
-text = "Description of selected difficulty..."
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "Description of selected pathogen type..."
 autowrap_mode = 2
 
-[node name="Spacer" type="Control" parent="Panel/Margin/VBox"]
+[node name="DiffBox" type="VBoxContainer" parent="SetupUI/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="SetupUI/Panel/Margin/VBox/DiffBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 14
+text = "CHOOSE DIFFICULTY LEVEL:"
+
+[node name="DiffHBox" type="HBoxContainer" parent="SetupUI/Panel/Margin/VBox/DiffBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DiffDesc" type="Label" parent="SetupUI/Panel/Margin/VBox/DiffBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
+theme_override_font_sizes/font_size = 12
+text = "Description of selected difficulty level..."
+autowrap_mode = 2
+
+[node name="Spacer" type="Control" parent="SetupUI/Panel/Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BtnStart" type="Button" parent="Panel/Margin/VBox"]
-custom_minimum_size = Vector2(0, 52)
+[node name="BtnStart" type="Button" parent="SetupUI/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_start_btn")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
-text = "COMMENCE OUTBREAK"
+theme_override_font_sizes/font_size = 16
+text = "☣ COMMENCE GLOBAL OUTBREAK ☣"
+
+[node name="FlashOverlay" type="ColorRect" parent="."]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0)
