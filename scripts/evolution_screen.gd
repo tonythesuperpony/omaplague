@@ -85,8 +85,8 @@ func _rebuild_tree():
 		if u.get("category") == current_category:
 			cat_upgrades.append(u)
 	
-	var btn_size = Vector2(150, 68)
-	var cell_size = Vector2(185, 105)
+	var btn_size = Vector2(150, 80)
+	var cell_size = Vector2(185, 120)
 	
 	# Determine bounds of grid across all upgrades in this category
 	var min_gx = 999
@@ -135,10 +135,28 @@ func _rebuild_tree():
 		btn.size = btn_size
 		btn.position = pos
 		btn.text = "%s\n%d DNA" % [u["name"], u["cost"]]
-		btn.add_theme_font_size_override("font_size", 12)
+		btn.add_theme_font_size_override("font_size", 11)
 		btn.tooltip_text = u.get("description", "")
 		
+		# Load upgrade icon — strip trailing _1/_2 so variants share the same icon file
 		var uid = u["id"]
+		var icon_base = uid
+		for suffix in ["_1", "_2"]:
+			if icon_base.ends_with(suffix):
+				icon_base = icon_base.substr(0, icon_base.length() - 2)
+				break
+		var icon_path = "res://assets/icons/upgrades/%s.png" % icon_base
+		if ResourceLoader.exists(icon_path):
+			var tex = load(icon_path) as Texture2D
+			if tex:
+				btn.icon = tex
+				btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
+				btn.expand_icon = false
+				btn.add_theme_constant_override("icon_max_width", 36)
+				btn.add_theme_constant_override("icon_margin_left", 0)
+				btn.add_theme_constant_override("icon_margin_right", 0)
+		
 		btn.pressed.connect(func(): _select_upgrade(uid))
 		
 		tree_canvas.add_child(btn)
