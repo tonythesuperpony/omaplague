@@ -70,10 +70,7 @@ func _unhandled_input(event: InputEvent):
 	if not visible:
 		return
 	if current_mode == Mode.CRACKTRO:
-		if event is InputEventKey and event.pressed:
-			_transition_to_setup()
-			get_viewport().set_input_as_handled()
-		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			_transition_to_setup()
 			get_viewport().set_input_as_handled()
 

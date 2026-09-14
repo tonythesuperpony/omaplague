@@ -117,12 +117,15 @@ func _on_restart_requested():
 	setup_screen.show_cracktro()
 
 func _on_open_about():
+	hud.hide_hover_info()
+	world_map.set_interactive(false)
 	if GameState.sim_speed > 0.0:
 		sim_speed_before_menu = GameState.sim_speed
 		GameState.set_sim_speed(0.0)
 	about_modal.open()
 
 func _on_close_about():
+	world_map.set_interactive(true)
 	if sim_speed_before_menu > 0.0 and GameState.sim_speed == 0.0:
 		GameState.set_sim_speed(sim_speed_before_menu)
 

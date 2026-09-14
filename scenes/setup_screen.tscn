@@ -217,7 +217,7 @@ offset_right = 2400.0
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.85, 0.2, 0.2, 1)
 theme_override_font_sizes/font_size = 12
-text = "[ OMAPLAGUE ] //// INFECT • EVOLVE • DOMINATE //// NO CURE // NO ESCAPE //// THE WORLD IS YOUR PETRI DISH //// PRESS ANY KEY //// OMAPLAGUE v1.0 //// CRACKED BY OMARCHY CREW ////"
+text = "[ OMAPLAGUE ] //// INFECT • EVOLVE • DOMINATE //// NO CURE // NO ESCAPE //// THE WORLD IS YOUR PETRI DISH //// CLICK TO CONTINUE //// OMAPLAGUE v1.0 //// CRACKED BY OMARCHY CREW ////"
 vertical_alignment = 1
 
 [node name="PromptLabel" type="Label" parent="CracktroUI"]
@@ -233,7 +233,7 @@ grow_vertical = 0
 theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
 theme_override_colors/font_shadow_color = Color(0.8, 0.1, 0.1, 0.8)
 theme_override_font_sizes/font_size = 13
-text = "[ PRESS ANY KEY OR CLICK TO CONTINUE ]"
+text = "[ CLICK TO CONTINUE ]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
