@@ -152,7 +152,26 @@ var funny_news_pool: Array[String] = [
 	"Global supply chain collapses as world realizes everything was made in one warehouse in one city.",
 	"Epidemiologists exhausted after being asked to explain exponential growth for the forty-seventh time this week.",
 	"Scientists discover the pathogen cannot survive a passive-aggressive Discord message thread.",
+	"United Nations holds emergency session; adjourns after forty minutes without reaching a decision.",
+	"World's leading virologist admits he has been pronouncing 'pathogen' wrong for thirty years.",
+	"Government urges citizens to remain calm while simultaneously purchasing underground bunker.",
+	"Airport duty-free shops report record sales of whiskey as travellers consider their life choices.",
+	"Last functioning social media platform collapses under weight of seventeen billion pandemic hot takes.",
+	"Billionaire announces plan to colonize Mars; scientists note it is a sensible time to bring this up.",
+	"Global shortage of latex gloves traced back to single factory worker who called in sick three weeks ago.",
+	"Hospitals introduce triage category 'probably fine, just panicking' to manage overwhelming demand.",
+	"Funeral industry reports unprecedented backlog; introduces express cremation subscription service.",
+	"World record set for longest unbroken chain of 'unprecedented events' in a single calendar year.",
+	"Scientists confirm the virus has no opinion on whether pineapple belongs on pizza.",
+	"Last international flight departs carrying seventeen epidemiologists, a goat, and a crate of hand sanitizer.",
+	"Small town declares itself independent nation to avoid WHO travel restrictions; immediately regrets it.",
+	"Man stockpiling bottled water for apocalypse discovers he has been accidentally stockpiling sparkling water.",
+	"Governments worldwide synchronize messaging: 'Everything is fine' translated into two hundred languages.",
+	"Military deployed to enforce lockdown; immediately confused by instructions to stand two metres apart.",
+	"Nation that mocked other countries for pandemic response now quietly googles 'how to pandemic response'.",
+	"Researchers discover that doing absolutely nothing was statistically the second best pandemic strategy.",
 ]
+
 
 func _ready():
 	funny_news_pool.shuffle()
@@ -298,7 +317,14 @@ func _start_next_breaking_news():
 	else:
 		icon = "🚨 BREAKING NEWS:"
 		
-	breaking_text = "%s  %s  %s" % [icon, raw_headline.to_upper(), icon]
+	# Strip any pre-existing "Breaking News:" prefix the game may have already added
+	var clean_headline = raw_headline.strip_edges()
+	for pfx in ["Breaking News: ", "Breaking News:", "BREAKING NEWS: ", "BREAKING NEWS:", "BREAKING: "]:
+		if clean_headline.begins_with(pfx):
+			clean_headline = clean_headline.substr(pfx.length()).strip_edges()
+			break
+
+	breaking_text = "%s  %s  %s" % [icon, clean_headline.to_upper(), icon]
 	news_label.text = breaking_text
 	news_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1.0))
 	
