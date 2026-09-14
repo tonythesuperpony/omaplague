@@ -316,23 +316,31 @@ func _draw():
 	# 0. Fill beyond-map area with matching ocean dark color (prevents gray border when zoomed out)
 	var vp_size = get_viewport_rect().size
 	# Draw extra large covering rect in local space (map transform applied by parent)
-	draw_rect(Rect2(-2000, -2000, 6000, 5000), Color(0.04, 0.07, 0.12, 1.0))
+	draw_rect(Rect2(-2000, -2000, 6000, 5000), Color(0.035, 0.05, 0.08, 1.0))
 	
-	# 1. Base Map: Realistic NASA Satellite Terrain
-	if map_texture:
-		draw_texture_rect(map_texture, Rect2(0, 0, MAP_WIDTH, MAP_HEIGHT), false)
-	else:
-		draw_rect(Rect2(0, 0, MAP_WIDTH, MAP_HEIGHT), Color(0.04, 0.07, 0.12, 1.0))
+	# 1. Base Map: Sleek tactical vector ocean (omaproton-vpn dark style)
+	draw_rect(Rect2(0, 0, MAP_WIDTH, MAP_HEIGHT), Color(0.038, 0.052, 0.082, 1.0))
+	
+	# 1b. Subtle tactical latitude & longitude grid lines
+	var grid_col = Color(0.12, 0.18, 0.26, 0.22)
+	# Latitude lines (every 160px = 30 degrees)
+	for lat_y in range(160, int(MAP_HEIGHT), 160):
+		draw_line(Vector2(0, lat_y), Vector2(MAP_WIDTH, lat_y), grid_col, 0.8)
+	# Longitude lines (every 160px = 30 degrees)
+	for lon_x in range(160, int(MAP_WIDTH), 160):
+		draw_line(Vector2(lon_x, 0), Vector2(lon_x, MAP_HEIGHT), grid_col, 0.8)
 		
 	# 2. Dotted Oceanic Transit Routes (Plague Inc shipping lanes)
 	var route_dash_phase = int(pulse_time * 6.0) % 6
 	for route in scenic_transit_lines:
 		for i in range(route.size() - 1):
 			if (i + route_dash_phase) % 3 != 0:
-				draw_line(route[i], route[i+1], Color(0.85, 0.2, 0.2, 0.32), 1.3)
+				draw_line(route[i], route[i+1], Color(0.85, 0.25, 0.25, 0.32), 1.2)
 				
-	# 3. Country Borders, Infections, and Hover/Selection Highlights
-	var base_border = Color(0.2, 0.42, 0.62, 0.42)
+	# 3. Country Vector Polygons (omaproton-vpn tactical vector style)
+	# Every country has a clean, crisp vector landmass fill and sharp border
+	var base_land_fill = Color(0.10, 0.14, 0.21, 0.95)
+	var base_border = Color(0.22, 0.32, 0.44, 0.60)
 	
 	for cid in country_polys:
 		var is_hovered = (cid == hovered_country_id)
@@ -345,54 +353,50 @@ func _draw():
 		var dead = state.get("dead", 0) if has_state else 0
 		var pop = float(state.get("population", 1)) if has_state else 1.0
 		var inf_ratio = clamp(float(inf) / max(1.0, pop * 0.45), 0.0, 1.0)
+		var dead_ratio = clamp(float(dead) / max(1.0, pop), 0.0, 1.0)
 		
-		# A. Translucent red tint for infected countries
-		if inf > 0:
-			var red_tint = Color(0.85, 0.12, 0.12, clamp(inf_ratio * 0.35 + 0.08, 0.08, 0.42))
-			for poly in plist:
-				draw_colored_polygon(poly, red_tint)
-				
-		# B. Hover or Selection glowing fills
+		# A. Vector Landmass Fill
+		var fill_color = base_land_fill
 		if is_hovered:
-			var hover_glow = Color(0.12, 0.8, 0.9, 0.38)
-			for poly in plist:
-				draw_colored_polygon(poly, hover_glow)
+			fill_color = Color(0.18, 0.75, 0.88, 0.45)
 		elif is_selected:
-			var sel_glow = Color(1.0, 0.85, 0.2, 0.25)
-			for poly in plist:
-				draw_colored_polygon(poly, sel_glow)
+			fill_color = Color(1.0, 0.85, 0.25, 0.38)
+		elif dead_ratio > 0.7:
+			fill_color = Color(0.18, 0.05, 0.05, 0.92)
+		elif inf > 0:
+			fill_color = Color(0.85, 0.12, 0.12, clamp(inf_ratio * 0.52 + 0.18, 0.18, 0.75))
+			
+		for poly in plist:
+			draw_colored_polygon(poly, fill_color)
 				
-		# C. Country Borders
+		# B. Country Borders
 		var border_color = base_border
-		var border_width = 0.9
+		var border_width = 0.85
 		
 		if is_hovered:
-			border_color = Color(0.35, 1.0, 0.95, 0.95)
+			border_color = Color(0.35, 0.95, 1.0, 1.0)
 			border_width = 2.2
 		elif is_selected:
-			border_color = Color(1.0, 0.88, 0.25, 1.0)
+			border_color = Color(1.0, 0.90, 0.30, 1.0)
 			border_width = 2.4
 		elif inf > 0:
-			border_color = Color(0.85, 0.25, 0.25, 0.65)
+			border_color = Color(0.95, 0.25, 0.25, 0.85)
 			
 		for poly in plist:
 			var closed = PackedVector2Array(poly)
 			closed.append(poly[0])
 			draw_polyline(closed, border_color, border_width, true)
 			
-		# D. Biological Infection Stipple Dots (Plague Inc virus nodes)
+		# C. Biological Infection Stipple Dots (Plague Inc virus nodes)
 		if inf > 0:
 			var cdata = DataManager.get_country(cid)
 			var stipples = cdata.get("stipple_points", [])
 			if not stipples.is_empty():
-				# Number of active dots scales with infection ratio
 				var active_dots = int(clamp(inf_ratio * float(stipples.size()) + 1.0, 1.0, float(stipples.size())))
 				var pulse = sin(pulse_time * 3.5 + float(active_dots)) * 0.2 + 0.8
 				for di in range(min(active_dots, stipples.size())):
 					var dpt = Vector2(stipples[di][0], stipples[di][1])
-					# Danger core
 					draw_circle(dpt, 1.6, Color(1.0, 0.18, 0.18, 0.9 * pulse))
-					# Halo
 					draw_circle(dpt, 3.2, Color(0.9, 0.1, 0.1, 0.28 * pulse))
 
 	# 4. Port Badges (Airports & Seaports)
