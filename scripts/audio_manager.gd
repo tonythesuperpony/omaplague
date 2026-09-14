@@ -8,7 +8,8 @@ var music_player: AudioStreamPlayer
 var intro_tracks: Array[String] = [
 	"res://assets/music/intro_1.ogg",
 	"res://assets/music/intro_2.ogg",
-	"res://assets/music/intro_3.ogg"
+	"res://assets/music/intro_3.ogg",
+	"res://assets/music/intro_4.ogg"
 ]
 var current_track_path: String = ""
 
