@@ -8,6 +8,9 @@ signal news_added(headline: String)
 signal plane_dispatched(from_id: String, to_id: String, is_infected: bool)
 signal ship_dispatched(from_id: String, to_id: String, is_infected: bool)
 signal game_ended(won: bool, reason: String)
+signal speed_changed(new_speed: float)
+signal bubble_count_changed(new_count: int)
+signal pop_all_bubbles_requested()
 
 # Game configuration
 var disease_name: String = "Omaplague"
@@ -54,6 +57,10 @@ var start_day: int = 12
 var is_playing: bool = false
 var game_over: bool = false
 var sim_speed: float = 1.0 # 0=pause, 1=1x, 2=2x, 4=3x
+
+func set_sim_speed(s: float):
+	sim_speed = s
+	speed_changed.emit(s)
 
 # Global counters
 var world_population: int = 0
@@ -124,6 +131,7 @@ func setup_new_game(p_name: String, p_type: String, p_diff: String):
 	is_playing = true
 	game_over = false
 	patient_zero_selected = false
+	set_sim_speed(1.0)
 	
 	# Difficulty starting bonus/penalty
 	if difficulty == "casual":

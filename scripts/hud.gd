@@ -15,6 +15,7 @@ signal open_world_requested()
 @onready var btn_3x: Button = $TopBar/Margin/HBox/SpeedBox/Btn3x
 
 @onready var btn_disease: Button = $BottomBar/Margin/HBox/BtnDisease
+@onready var btn_pop_all: Button = $BottomBar/Margin/HBox/BtnPopAll
 @onready var dna_label: Label = $BottomBar/Margin/HBox/BtnDisease/DnaBadge/DnaLabel
 @onready var pop_label: Label = $BottomBar/Margin/HBox/StatsBox/PopLabel
 @onready var inf_label: Label = $BottomBar/Margin/HBox/StatsBox/InfLabel
@@ -134,6 +135,8 @@ func _ready():
 	GameState.stats_updated.connect(_update_stats)
 	GameState.dna_changed.connect(_on_dna_changed)
 	GameState.news_added.connect(_on_news_added)
+	GameState.speed_changed.connect(_update_speed_buttons)
+	GameState.bubble_count_changed.connect(_update_bubble_count)
 	
 	# Load real control icons
 	if ResourceLoader.exists("res://assets/icons/pause.png"):
@@ -159,16 +162,22 @@ func _ready():
 	btn_3x.pressed.connect(func(): _set_sim_speed(4.0))
 	
 	btn_disease.pressed.connect(func(): open_evolution_requested.emit())
+	btn_pop_all.pressed.connect(_on_pop_all_pressed)
 	btn_spore.pressed.connect(_on_spore_pressed)
 	
 	hover_card.hide()
 	
 	_update_stats()
-	_update_speed_buttons(1.0)
+	_update_speed_buttons(GameState.sim_speed)
+	_update_bubble_count(0)
 	
 	btn_spore.visible = (GameState.disease_type == "fungus")
 
 func _process(delta: float):
+	if btn_pop_all and not btn_pop_all.disabled:
+		var pulse = sin(Time.get_ticks_msec() * 0.007) * 0.15 + 0.85
+		btn_pop_all.modulate = Color(1.0, pulse, pulse, 1.0)
+		
 	if current_news_mode == NewsMode.NORMAL_MARQUEE:
 		# If breaking news is queued, immediately interrupt the marquee
 		if breaking_queue.size() > 0:
@@ -360,9 +369,23 @@ func hide_hover_info():
 	hover_card.hide()
 
 func _set_sim_speed(s: float):
-	GameState.sim_speed = s
-	_update_speed_buttons(s)
+	GameState.set_sim_speed(s)
 	AudioManager.play_sfx("click")
+
+func _on_pop_all_pressed():
+	GameState.pop_all_bubbles_requested.emit()
+	AudioManager.play_sfx("click")
+
+func _update_bubble_count(count: int):
+	if btn_pop_all:
+		if count > 0:
+			btn_pop_all.disabled = false
+			btn_pop_all.text = "💥 POP ALL (%d)" % count
+			btn_pop_all.modulate.a = 1.0
+		else:
+			btn_pop_all.disabled = true
+			btn_pop_all.text = "💥 POP ALL (0)"
+			btn_pop_all.modulate.a = 0.45
 
 func _update_speed_buttons(current_speed: float):
 	btn_pause.modulate = Color(1.3, 0.5, 0.5) if current_speed == 0.0 else Color(0.7, 0.7, 0.7)

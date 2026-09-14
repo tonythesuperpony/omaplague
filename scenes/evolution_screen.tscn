@@ -95,12 +95,20 @@ layout_mode = 2
 theme_override_constants/separation = 6
 
 [node name="TitleLabel" type="Label" parent="Root/VBox/TopBar/Margin/HBox"]
-custom_minimum_size = Vector2(130, 0)
+custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
 theme_override_font_sizes/font_size = 18
 text = "🧬 EVOLVE"
+vertical_alignment = 1
+
+[node name="PauseBadge" type="Label" parent="Root/VBox/TopBar/Margin/HBox"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 0.45, 0.45, 0.8)
+theme_override_font_sizes/font_size = 11
+text = "[ PAUSED ]"
 vertical_alignment = 1
 
 [node name="Separator1" type="VSeparator" parent="Root/VBox/TopBar/Margin/HBox"]

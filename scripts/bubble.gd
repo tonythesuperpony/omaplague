@@ -41,20 +41,24 @@ func _ready():
 	# Ensure the bubble input is handled before anything else beneath it
 	set_process_input(true)
 
+var anim_time: float = 0.0
+
 func _process(delta: float):
-	elapsed += delta
+	anim_time += delta
 	# Floating bobbing motion
-	position = initial_pos + Vector2(0, sin(elapsed * 3.2) * 5.5)
+	position = initial_pos + Vector2(0, sin(anim_time * 3.2) * 5.5)
 	
 	# Gentle pulsing scale
-	var pulse = 1.0 + sin(elapsed * 4.8) * 0.07
+	var pulse = 1.0 + sin(anim_time * 4.8) * 0.07
 	scale = base_scale * pulse
 	
-	# Auto fade out near end of life
-	if elapsed >= life_time - 2.0:
-		modulate.a = clamp((life_time - elapsed) / 2.0, 0.0, 1.0)
-	if elapsed >= life_time:
-		queue_free()
+	# Only expire and fade while simulation is active
+	if GameState.sim_speed > 0.0:
+		elapsed += delta * GameState.sim_speed
+		if elapsed >= life_time - 2.0:
+			modulate.a = clamp((life_time - elapsed) / 2.0, 0.0, 1.0)
+		if elapsed >= life_time:
+			queue_free()
 
 func _on_input_event(_viewport, event, _shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:

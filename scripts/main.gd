@@ -8,6 +8,7 @@ extends Node
 @onready var game_over_modal: CanvasLayer = $GameOverModal
 
 var sim_timer: float = 0.0
+var sim_speed_before_menu: float = 1.0
 
 func _ready():
 	# Set ocean-matching background clear color (eliminates gray on zoom out)
@@ -55,23 +56,40 @@ func _on_country_hovered(cid: String, pos: Vector2):
 func _on_country_unhovered():
 	hud.hide_hover_info()
 
+func _unhandled_input(event: InputEvent):
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_B:
+			if world_map and world_map.get_active_bubble_count() > 0:
+				GameState.pop_all_bubbles_requested.emit()
+				get_viewport().set_input_as_handled()
+
 func _on_country_selected(cid: String):
 	hud.hide_hover_info()
 	world_map.set_interactive(false)
+	if GameState.sim_speed > 0.0:
+		sim_speed_before_menu = GameState.sim_speed
+		GameState.set_sim_speed(0.0)
 	country_panel.display_country(cid)
 
 func _on_close_country_panel():
 	world_map.set_interactive(true)
+	if sim_speed_before_menu > 0.0 and GameState.sim_speed == 0.0:
+		GameState.set_sim_speed(sim_speed_before_menu)
 
 func _on_open_evolution():
 	hud.hide_hover_info()
 	world_map.set_interactive(false)
 	country_panel.hide()
+	if GameState.sim_speed > 0.0:
+		sim_speed_before_menu = GameState.sim_speed
+		GameState.set_sim_speed(0.0)
 	evolution_screen.open()
 
 func _on_close_evolution():
 	evolution_screen.hide()
 	world_map.set_interactive(true)
+	if sim_speed_before_menu > 0.0 and GameState.sim_speed == 0.0:
+		GameState.set_sim_speed(sim_speed_before_menu)
 
 func _on_game_started():
 	setup_screen.hide()

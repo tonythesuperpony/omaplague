@@ -58,7 +58,8 @@ func _eval_bezier(s: float) -> Vector2:
 	return q0.lerp(q1, s)
 
 func _process(delta: float):
-	elapsed += delta
+	if GameState.sim_speed > 0.0:
+		elapsed += delta * GameState.sim_speed
 	var t = clamp(elapsed / travel_time, 0.0, 1.0)
 	
 	# Quadratic Bezier position

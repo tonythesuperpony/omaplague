@@ -48,6 +48,7 @@ func _ready():
 	GameState.plane_dispatched.connect(_on_plane_dispatched)
 	GameState.ship_dispatched.connect(_on_ship_dispatched)
 	GameState.bubble_spawned.connect(_on_bubble_spawned)
+	GameState.pop_all_bubbles_requested.connect(pop_all_bubbles)
 	
 	# Center map initially in viewport with responsive zoom
 	var vp_size = get_viewport_rect().size
@@ -96,11 +97,12 @@ func set_interactive(state: bool):
 func _process(delta: float):
 	pulse_time += delta
 	
-	# Spawn ambient flights and ships continuously
-	ambient_timer += delta
-	if ambient_timer >= AMBIENT_INTERVAL:
-		ambient_timer = 0.0
-		_spawn_ambient_traffic()
+	# Spawn ambient flights and ships continuously when not paused
+	if GameState.sim_speed > 0.0:
+		ambient_timer += delta * GameState.sim_speed
+		if ambient_timer >= AMBIENT_INTERVAL:
+			ambient_timer = 0.0
+			_spawn_ambient_traffic()
 		
 	queue_redraw()
 
@@ -422,3 +424,43 @@ func _on_bubble_spawned(type: String, world_pos: Vector2, cid: String):
 	var bubble = bubble_scene.instantiate()
 	bubble.setup(type, world_pos, cid)
 	bubbles_node.add_child(bubble)
+	bubble.tree_exited.connect(_on_bubble_tree_exited)
+	_notify_bubble_count()
+
+func _on_bubble_tree_exited():
+	call_deferred("_notify_bubble_count")
+
+func _notify_bubble_count():
+	var count = get_active_bubble_count()
+	GameState.bubble_count_changed.emit(count)
+
+func get_active_bubble_count() -> int:
+	var c = 0
+	for b in bubbles_node.get_children():
+		if is_instance_valid(b) and not b.is_queued_for_deletion():
+			c += 1
+	return c
+
+func pop_all_bubbles():
+	var bubbles = []
+	for b in bubbles_node.get_children():
+		if is_instance_valid(b) and not b.is_queued_for_deletion():
+			bubbles.append(b)
+	
+	if bubbles.is_empty():
+		return
+		
+	# Stagger pops over at most 0.35s for delightful audio-visual cascade
+	for i in range(bubbles.size()):
+		var b = bubbles[i]
+		if is_instance_valid(b) and not b.is_queued_for_deletion():
+			if i == 0:
+				b.pop()
+			else:
+				var delay = min(float(i) * 0.035, 0.35)
+				var timer = get_tree().create_timer(delay)
+				timer.timeout.connect(func():
+					if is_instance_valid(b) and not b.is_queued_for_deletion():
+						b.pop()
+				)
+
