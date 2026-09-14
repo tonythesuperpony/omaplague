@@ -44,24 +44,44 @@ func play_sfx(name: String, volume_db: float = 0.0):
 	audio_players[0].volume_db = volume_db
 	audio_players[0].play()
 
+var current_track_index: int = 0
+var is_intro_music_active: bool = false
+
 func play_random_intro_music():
+	is_intro_music_active = true
+	current_track_index = randi() % intro_tracks.size()
+	_play_current_intro_track()
+
+func _play_current_intro_track():
+	if not is_intro_music_active:
+		return
 	if music_player == null:
 		music_player = AudioStreamPlayer.new()
+		music_player.bus = "Master"
 		add_child(music_player)
 		
-	if music_player.playing:
-		return
+	if not music_player.finished.is_connected(_on_intro_music_finished):
+		music_player.finished.connect(_on_intro_music_finished)
 		
-	var track = intro_tracks[randi() % intro_tracks.size()]
+	var track = intro_tracks[current_track_index % intro_tracks.size()]
 	current_track_path = track
 	if ResourceLoader.exists(track):
 		var stream = load(track)
 		music_player.stream = stream
 		music_player.volume_db = -2.5
 		music_player.play()
-		print("AudioManager: playing random intro music track -> ", track)
+		print("AudioManager: playing intro track [%d/%d] -> %s" % [current_track_index + 1, intro_tracks.size(), track])
+
+func _on_intro_music_finished():
+	if not is_intro_music_active:
+		return
+	# Loop to next song in rotation
+	current_track_index = (current_track_index + 1) % intro_tracks.size()
+	print("AudioManager: intro track finished, rotating to next song: index %d" % current_track_index)
+	_play_current_intro_track()
 
 func stop_intro_music(fade_out_sec: float = 1.0):
+	is_intro_music_active = false
 	if music_player and music_player.playing:
 		var tween = create_tween()
 		tween.tween_property(music_player, "volume_db", -40.0, fade_out_sec)

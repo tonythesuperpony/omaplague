@@ -87,49 +87,47 @@ func _process(delta: float):
 
 func _draw():
 	var t = clamp(elapsed / travel_time, 0.0, 1.0)
-	
+	if t <= 0.005:
+		return
+		
 	if is_infected:
-		# Flowing red dashed infection carrier beam tracing behind the vehicle
-		var steps = 28
-		var current_step = int(t * float(steps))
-		var dash_phase = int(elapsed * 20.0)
-		
-		# Trailing path from origin to current position
-		for s in range(current_step):
-			var s1 = float(s) / float(steps)
-			var s2 = float(s + 1) / float(steps)
-			if s2 > t:
-				s2 = t
-				
-			if (s + dash_phase) % 3 != 0:
-				var p1 = to_local(_eval_bezier(s1))
-				var p2 = to_local(_eval_bezier(s2))
-				# Glowing red outer halo
-				draw_line(p1, p2, Color(1.0, 0.08, 0.08, 0.35), 4.5)
-				# Bright core dashed red flow line
-				draw_line(p1, p2, Color(1.0, 0.25, 0.25, 0.95), 2.0)
-				
 		# Pulsing beacon at the infected origin country
-		var origin_pulse = sin(elapsed * 6.0) * 0.3 + 0.7
-		draw_circle(to_local(start_pos), 3.5, Color(1.0, 0.15, 0.15, 0.75 * origin_pulse))
+		var local_start = start_pos - position
+		var origin_pulse = sin(elapsed * 8.0) * 0.35 + 0.65
+		draw_circle(local_start, 4.5, Color(1.0, 0.15, 0.15, 0.85 * origin_pulse))
+		draw_circle(local_start, 2.0, Color(1.0, 0.95, 0.95, 0.95))
 		
-		# Faint forward projection dots toward target destination
-		for s in range(current_step, steps):
-			var s1 = float(s) / float(steps)
-			var s2 = float(s + 1) / float(steps)
-			if (s + dash_phase) % 4 == 0:
-				var p1 = to_local(_eval_bezier(s1))
-				var p2 = to_local(_eval_bezier(s2))
-				draw_line(p1, p2, Color(0.9, 0.25, 0.25, 0.22), 1.2)
+		# Flowing red dashed infection carrier beam strictly trailing behind the vehicle
+		var steps = 36
+		var current_steps = int(t * float(steps))
+		var dash_phase = int(elapsed * 24.0)
+		
+		var prev_point = local_start
+		for s in range(1, current_steps + 1):
+			var s_val = min(t, float(s) / float(steps))
+			var pt = _eval_bezier(s_val) - position
+			
+			# Animated dashed segment (draw 2, skip 1)
+			if (s + dash_phase) % 3 != 0:
+				# Glowing red outer halo
+				draw_line(prev_point, pt, Color(1.0, 0.08, 0.08, 0.40), 4.5)
+				# Bright core dashed red flow line
+				draw_line(prev_point, pt, Color(1.0, 0.25, 0.25, 0.95), 2.2)
+				
+			prev_point = pt
+			
+		# Connect smoothly to the vehicle sprite center (Vector2.ZERO)
+		if prev_point != Vector2.ZERO:
+			draw_line(prev_point, Vector2.ZERO, Color(1.0, 0.25, 0.25, 0.95), 2.2)
 	else:
 		# Standard uninfected vehicle faint wake/contrail
 		if trail_points.size() >= 2:
 			var base_col = Color(0.85, 0.95, 1.0) if vehicle_type == "air" else Color(0.5, 0.85, 1.0)
 			for i in range(trail_points.size() - 1):
-				var p1 = to_local(trail_points[i])
-				var p2 = to_local(trail_points[i + 1])
+				var p1 = trail_points[i] - position
+				var p2 = trail_points[i + 1] - position
 				var progress = float(i) / float(trail_points.size())
 				var alpha = (1.0 - progress) * (0.45 if vehicle_type == "air" else 0.35)
 				var col = base_col
 				col.a = alpha
-				draw_line(p1, p2, col, 1.5 - progress * 0.6)
+				draw_line(p1, p2, col, 1.5 - progress * 0.5)

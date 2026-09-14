@@ -184,13 +184,8 @@ func _spawn_ambient_traffic():
 	if c2.is_empty():
 		return
 		
-	# Determine if infected flight/ship
+	# Ambient traffic is normal commercial traffic (not infection vectors)
 	var is_inf = false
-	if GameState.country_states.has(c1_id):
-		var state = GameState.country_states[c1_id]
-		if state["is_infected"]:
-			var inf_ratio = float(state["infected"]) / max(1.0, float(state["population"]))
-			is_inf = (randf() < clamp(inf_ratio * 4.0 + 0.15, 0.15, 0.95))
 			
 	var p1 = Vector2(c1.get("map_x", 0), c1.get("map_y", 0))
 	var p2 = Vector2(c2.get("map_x", 0), c2.get("map_y", 0))
