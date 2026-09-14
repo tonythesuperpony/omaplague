@@ -21,6 +21,7 @@ func _ready():
 	world_map.country_selected.connect(_on_country_selected)
 	world_map.country_hovered.connect(_on_country_hovered)
 	world_map.country_unhovered.connect(_on_country_unhovered)
+	world_map.country_deselected.connect(_on_country_deselected)
 	
 	hud.open_evolution_requested.connect(_on_open_evolution)
 	hud.open_about_requested.connect(_on_open_about)
@@ -59,6 +60,14 @@ func _on_country_hovered(cid: String, pos: Vector2):
 
 func _on_country_unhovered():
 	hud.hide_hover_info()
+
+func _on_country_deselected():
+	hud.hide_hover_info()
+	if country_panel.visible:
+		country_panel.hide()
+		world_map.set_interactive(true)
+		if sim_speed_before_menu > 0.0 and GameState.sim_speed == 0.0:
+			GameState.set_sim_speed(sim_speed_before_menu)
 
 func _unhandled_input(event: InputEvent):
 	if event is InputEventKey and event.pressed and not event.echo:

@@ -101,6 +101,14 @@ func stop_intro_music(fade_out_sec: float = 1.0):
 		tween.tween_property(music_player, "volume_db", -40.0, fade_out_sec)
 		tween.tween_callback(music_player.stop)
 
+func skip_track():
+	# Advance to next track immediately
+	current_track_index = (current_track_index + 1) % intro_tracks.size()
+	is_intro_music_active = true
+	if music_player and music_player.playing:
+		music_player.stop()
+	_play_current_intro_track()
+
 # ─── About Modal Music ──────────────────────────────────────────────
 func play_about_music():
 	if about_player and about_player.stream:

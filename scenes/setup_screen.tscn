@@ -237,6 +237,23 @@ text = "[ PRESS ANY KEY OR CLICK TO CONTINUE ]"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="BtnNextTrack" type="Button" parent="CracktroUI"]
+layout_mode = 1
+anchors_preset = 4
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -140.0
+offset_top = -50.0
+offset_right = -10.0
+offset_bottom = -12.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "⏭  NEXT TRACK"
+
 [node name="SetupUI" type="Control" parent="."]
 visible = false
 layout_mode = 3

@@ -24,6 +24,7 @@ var current_mode: Mode = Mode.CRACKTRO
 @onready var diff_desc: Label = $SetupUI/Panel/Margin/VBox/DiffBox/DiffDesc
 @onready var btn_start: Button = $SetupUI/Panel/Margin/VBox/BtnStart
 @onready var btn_intro: Button = $SetupUI/Panel/Margin/VBox/HeaderHBox/BtnIntro
+@onready var btn_next_track: Button = $CracktroUI/BtnNextTrack
 
 # ─── SIMULATION & ANIMATION STATE ────────────────────────
 var sim_time: float = 0.0
@@ -58,6 +59,8 @@ func _ready():
 	btn_start.pressed.connect(_on_start_pressed)
 	if btn_intro:
 		btn_intro.pressed.connect(_transition_to_cracktro)
+	if btn_next_track:
+		btn_next_track.pressed.connect(_on_next_track_pressed)
 	
 	ticker_label.text = ticker_text + ticker_text
 	_set_mode(Mode.CRACKTRO)
@@ -71,8 +74,15 @@ func _unhandled_input(event: InputEvent):
 			_transition_to_setup()
 			get_viewport().set_input_as_handled()
 		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			# Don't transition if clicking the next-track button
+			if btn_next_track and btn_next_track.get_global_rect().has_point(event.position):
+				return
 			_transition_to_setup()
 			get_viewport().set_input_as_handled()
+
+func _on_next_track_pressed():
+	AudioManager.skip_track()
+	get_viewport().set_input_as_handled()
 
 func _process(delta: float):
 	sim_time += delta

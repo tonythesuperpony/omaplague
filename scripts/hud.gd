@@ -46,7 +46,7 @@ var current_news_mode: NewsMode = NewsMode.NORMAL_MARQUEE
 var breaking_queue: Array[String] = []
 
 # Continuous Marquee Ribbon
-const SEPARATOR: String = "      ◆      "
+const SEPARATOR: String = "   ◆   "
 var active_items: Array[String] = []
 var scroll_pos: float = 0.0
 var marquee_speed: float = 85.0

@@ -35,9 +35,13 @@ func close():
 	hide()
 	closed.emit()
 
-func _unhandled_input(event: InputEvent):
+func _input(event: InputEvent):
 	if not visible:
 		return
-	if event.is_action_pressed("ui_cancel") or (event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE):
-		close()
+	# Swallow ALL mouse events (including scroll wheel) so they don't zoom the map behind
+	if event is InputEventMouseButton or event is InputEventMouseMotion:
 		get_viewport().set_input_as_handled()
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_ESCAPE or event.is_action_pressed("ui_cancel"):
+			close()
+			get_viewport().set_input_as_handled()

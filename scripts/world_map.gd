@@ -3,6 +3,7 @@ extends Node2D
 signal country_selected(country_id: String)
 signal country_hovered(country_id: String, screen_pos: Vector2)
 signal country_unhovered()
+signal country_deselected()
 
 @onready var vehicles_node: Node2D = $Vehicles
 @onready var bubbles_node: Node2D = $Bubbles
@@ -246,6 +247,12 @@ func _handle_left_click(screen_pos: Vector2):
 			country_selected.emit(cid)
 			AudioManager.play_sfx("click")
 		queue_redraw()
+	else:
+		# Clicked empty ocean/void — deselect
+		if selected_country_id != "":
+			selected_country_id = ""
+			country_deselected.emit()
+			queue_redraw()
 
 func _get_country_at_pos(p: Vector2) -> String:
 	# Bounding-box pre-filtering for fast picking
