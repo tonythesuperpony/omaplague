@@ -49,13 +49,14 @@ var breaking_queue: Array[String] = []
 const SEPARATOR: String = "   ◆   "
 var active_items: Array[String] = []
 var scroll_pos: float = 0.0
-var marquee_speed: float = 72.0
+var marquee_speed: float = 68.0
 var funny_index: int = 0
 
 # Breaking News State
 var breaking_text: String = ""
 var breaking_x: float = 0.0
-var breaking_speed: float = 115.0
+var breaking_speed: float = 85.0
+var breaking_cooldown: float = 0.0
 
 var funny_news_pool: Array[String] = [
 	# Tony the Pony (Creator of Omaplague)
@@ -234,8 +235,9 @@ func _process(delta: float):
 		btn_pop_all.modulate = Color(1.0, pulse, pulse, 1.0)
 		
 	if current_news_mode == NewsMode.NORMAL_MARQUEE:
-		# If breaking news is queued, immediately interrupt the marquee
-		if breaking_queue.size() > 0:
+		if breaking_cooldown > 0.0:
+			breaking_cooldown -= delta
+		elif breaking_queue.size() > 0:
 			_start_next_breaking_news()
 			return
 			
@@ -263,10 +265,7 @@ func _process(delta: float):
 		
 		var full_w = _get_text_width(breaking_text)
 		if breaking_x < -full_w - 30.0:
-			if breaking_queue.size() > 0:
-				_start_next_breaking_news()
-			else:
-				_return_to_normal_marquee()
+			_return_to_normal_marquee()
 			
 	patient_zero_hint.visible = not GameState.patient_zero_selected
 	if patient_zero_hint.visible:
@@ -337,6 +336,7 @@ func _start_next_breaking_news():
 
 func _return_to_normal_marquee():
 	current_news_mode = NewsMode.NORMAL_MARQUEE
+	breaking_cooldown = 10.0 # At least 10 seconds of WIRE ticker between breaking alerts
 	_set_badge_normal()
 	news_label.add_theme_color_override("font_color", Color(0.85, 0.94, 1.0, 0.95))
 	_update_marquee_text()
@@ -361,10 +361,11 @@ func _set_badge_breaking():
 		sb.border_color = Color(0.95, 0.3, 0.3, 0.9)
 
 func _on_news_added(headline: String):
-	# Cap the queue so a burst of infections doesn't lock the ticker in breaking mode
-	if breaking_queue.size() < 3:
-		breaking_queue.append(headline)
-	if current_news_mode == NewsMode.NORMAL_MARQUEE:
+	# Keep queue small (max 2) so we don't accumulate a wall of stale alerts
+	if breaking_queue.size() >= 2:
+		breaking_queue.pop_front()
+	breaking_queue.append(headline)
+	if current_news_mode == NewsMode.NORMAL_MARQUEE and breaking_cooldown <= 0.0:
 		_start_next_breaking_news()
 
 func show_hover_info(cid: String, screen_pos: Vector2):
