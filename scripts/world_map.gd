@@ -330,14 +330,7 @@ func _draw():
 	for lon_x in range(160, int(MAP_WIDTH), 160):
 		draw_line(Vector2(lon_x, 0), Vector2(lon_x, MAP_HEIGHT), grid_col, 0.8)
 		
-	# 2. Dotted Oceanic Transit Routes (Plague Inc shipping lanes)
-	var route_dash_phase = int(pulse_time * 6.0) % 6
-	for route in scenic_transit_lines:
-		for i in range(route.size() - 1):
-			if (i + route_dash_phase) % 3 != 0:
-				draw_line(route[i], route[i+1], Color(0.85, 0.25, 0.25, 0.32), 1.2)
-				
-	# 3. Country Vector Polygons (omaproton-vpn tactical vector style)
+	# 2. Country Vector Polygons (omaproton-vpn tactical vector style)
 	# Every country has a clean, crisp vector landmass fill and sharp border
 	var base_land_fill = Color(0.10, 0.14, 0.21, 0.95)
 	var base_border = Color(0.22, 0.32, 0.44, 0.60)

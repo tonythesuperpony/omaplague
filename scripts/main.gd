@@ -83,7 +83,7 @@ func _on_restart_requested():
 	evolution_screen.hide()
 	hud.hide_hover_info()
 	world_map.set_interactive(false)
-	setup_screen.show()
+	setup_screen.show_cracktro()
 
 # ─── Omarchy System Font Integration ──────────────────────────────
 # Resolves the current Omarchy monospace font (via fontconfig/omarchy font current)

@@ -638,3 +638,6 @@ func get_formatted_date() -> String:
 			m = 1
 			y += 1
 	return "%02d %s %d" % [d, months[m - 1], y]
+
+func get_date_string() -> String:
+	return get_formatted_date()

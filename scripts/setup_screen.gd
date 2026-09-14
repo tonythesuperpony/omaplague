@@ -61,6 +61,7 @@ func _ready():
 	
 	ticker_label.text = ticker_text + ticker_text
 	_set_mode(Mode.CRACKTRO)
+	AudioManager.play_random_intro_music()
 
 func _unhandled_input(event: InputEvent):
 	if not visible:
@@ -232,6 +233,7 @@ func _on_start_pressed():
 	var dname = name_edit.text.strip_edges()
 	if dname == "":
 		dname = "Omaplague"
+	AudioManager.stop_intro_music(1.2)
 	GameState.setup_new_game(dname, selected_type, selected_diff)
 	AudioManager.play_sfx("evolve")
 	hide()
@@ -239,4 +241,5 @@ func _on_start_pressed():
 
 func show_cracktro():
 	_set_mode(Mode.CRACKTRO)
+	AudioManager.play_random_intro_music()
 	show()

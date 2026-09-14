@@ -85,19 +85,54 @@ func _rebuild_tree():
 		if u.get("category") == current_category:
 			cat_upgrades.append(u)
 	
-	var grid_origin = Vector2(60, 40)
-	var cell_size = Vector2(175, 95)
+	var btn_size = Vector2(150, 68)
+	var cell_size = Vector2(185, 105)
 	
-	# Track canvas extent
-	var max_x = 0.0
-	var max_y = 0.0
+	# Determine bounds of grid across all upgrades in this category
+	var min_gx = 999
+	var max_gx = -999
+	var min_gy = 999
+	var max_gy = -999
+	for u in cat_upgrades:
+		var grid = u.get("grid", [0, 0])
+		min_gy = min(min_gy, grid[0])
+		max_gy = max(max_gy, grid[0])
+		min_gx = min(min_gx, grid[1])
+		max_gx = max(max_gx, grid[1])
+		
+	if min_gx > max_gx:
+		min_gx = 0; max_gx = 0; min_gy = 0; max_gy = 0
+		
+	var grid_span_x = max_gx - min_gx
+	var grid_span_y = max_gy - min_gy
+	var cluster_w = grid_span_x * cell_size.x + btn_size.x
+	var cluster_h = grid_span_y * cell_size.y + btn_size.y
+	
+	# Compute available canvas area inside scroll container
+	var avail_w = scroll_container.size.x
+	var avail_h = scroll_container.size.y
+	if avail_w < 200.0:
+		avail_w = 880.0
+	if avail_h < 200.0:
+		avail_h = 560.0
+		
+	var origin_x = max(30.0, (avail_w - cluster_w) * 0.5)
+	var origin_y = max(30.0, (avail_h - cluster_h) * 0.5)
+	
+	# Set tree_canvas size to at least fill the container (so center calculation holds)
+	var total_w = max(avail_w, origin_x + cluster_w + 40.0)
+	var total_h = max(avail_h, origin_y + cluster_h + 40.0)
+	tree_canvas.custom_minimum_size = Vector2(total_w, total_h)
 	
 	for u in cat_upgrades:
 		var grid = u.get("grid", [0, 0])
-		var pos = grid_origin + Vector2(grid[1] * cell_size.x, grid[0] * cell_size.y)
+		var col = grid[1] - min_gx
+		var row = grid[0] - min_gy
+		var pos = Vector2(origin_x + col * cell_size.x, origin_y + row * cell_size.y)
 		
 		var btn = Button.new()
-		btn.custom_minimum_size = Vector2(148, 68)
+		btn.custom_minimum_size = btn_size
+		btn.size = btn_size
 		btn.position = pos
 		btn.text = "%s\n%d DNA" % [u["name"], u["cost"]]
 		btn.add_theme_font_size_override("font_size", 12)
@@ -108,12 +143,7 @@ func _rebuild_tree():
 		
 		tree_canvas.add_child(btn)
 		upgrade_buttons[uid] = btn
-		
-		max_x = max(max_x, pos.x + 160)
-		max_y = max(max_y, pos.y + 90)
 	
-	# Expand scroll canvas to fit content
-	tree_canvas.custom_minimum_size = Vector2(max_x + 40, max_y + 40)
 	tree_canvas.queue_redraw()
 
 func _select_upgrade(uid: String):
