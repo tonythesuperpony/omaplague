@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://sol72w3g5a5g"
-path="res://.godot/imported/symp_necrosis.png-1d99960caa488c9acf537f155dad3ddf.ctex"
+uid="uid://bfdh6ldhej5r4"
+path="res://.godot/imported/icons_source.png-8c8fed51cebb74ee5283bec3083953d2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/icons/upgrades/symp_necrosis.png"
-dest_files=["res://.godot/imported/symp_necrosis.png-1d99960caa488c9acf537f155dad3ddf.ctex"]
+source_file="res://assets/icons/upgrades/icons_source.png"
+dest_files=["res://.godot/imported/icons_source.png-8c8fed51cebb74ee5283bec3083953d2.ctex"]
 
 [params]
 
