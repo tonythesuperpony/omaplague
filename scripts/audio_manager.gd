@@ -5,11 +5,16 @@ var audio_players: Array[AudioStreamPlayer] = []
 const POOL_SIZE: int = 8
 
 var music_player: AudioStreamPlayer
+var about_player: AudioStreamPlayer
 var intro_tracks: Array[String] = [
 	"res://assets/music/intro_1.ogg",
 	"res://assets/music/intro_2.ogg",
 	"res://assets/music/intro_3.ogg",
-	"res://assets/music/intro_4.ogg"
+	"res://assets/music/intro_4.ogg",
+	"res://assets/music/intro_5.ogg",
+	"res://assets/music/intro_6.ogg",
+	"res://assets/music/intro_7.ogg",
+	"res://assets/music/intro_8.ogg",
 ]
 var current_track_path: String = ""
 
@@ -23,6 +28,14 @@ func _ready():
 	music_player = AudioStreamPlayer.new()
 	music_player.bus = "Master"
 	add_child(music_player)
+	
+	about_player = AudioStreamPlayer.new()
+	about_player.bus = "Master"
+	about_player.volume_db = -2.5
+	add_child(about_player)
+	const ABOUT_MUSIC = "res://assets/music/about_theme.ogg"
+	if ResourceLoader.exists(ABOUT_MUSIC):
+		about_player.stream = load(ABOUT_MUSIC)
 
 func _load_sounds():
 	var sound_names = ["pop", "dna_pop", "evolve", "alert", "cure_warn", "click", "victory", "game_over"]
@@ -87,3 +100,23 @@ func stop_intro_music(fade_out_sec: float = 1.0):
 		var tween = create_tween()
 		tween.tween_property(music_player, "volume_db", -40.0, fade_out_sec)
 		tween.tween_callback(music_player.stop)
+
+# ─── About Modal Music ──────────────────────────────────────────────
+func play_about_music():
+	if about_player and about_player.stream:
+		about_player.play()
+		# Fade in the main music out while about music plays
+		if music_player and music_player.playing:
+			var t = create_tween()
+			t.tween_property(music_player, "volume_db", -20.0, 0.5)
+
+func stop_about_music():
+	if about_player and about_player.playing:
+		var t = create_tween()
+		t.tween_property(about_player, "volume_db", -40.0, 0.5)
+		t.tween_callback(about_player.stop)
+		t.tween_callback(func(): about_player.volume_db = -2.5)
+	# Restore main music volume
+	if music_player and music_player.playing:
+		var t2 = create_tween()
+		t2.tween_property(music_player, "volume_db", -2.5, 0.8)

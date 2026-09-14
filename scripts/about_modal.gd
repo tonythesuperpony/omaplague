@@ -26,10 +26,12 @@ func open():
 	show()
 	if video_player:
 		video_player.play()
+	AudioManager.play_about_music()
 
 func close():
 	if video_player and video_player.is_playing():
 		video_player.stop()
+	AudioManager.stop_about_music()
 	hide()
 	closed.emit()
 
