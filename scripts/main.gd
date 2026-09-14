@@ -6,6 +6,7 @@ extends Node
 @onready var evolution_screen: CanvasLayer = $EvolutionScreen
 @onready var setup_screen: CanvasLayer = $SetupScreen
 @onready var game_over_modal: CanvasLayer = $GameOverModal
+@onready var about_modal: CanvasLayer = $AboutModal
 
 var sim_timer: float = 0.0
 var sim_speed_before_menu: float = 1.0
@@ -22,6 +23,8 @@ func _ready():
 	world_map.country_unhovered.connect(_on_country_unhovered)
 	
 	hud.open_evolution_requested.connect(_on_open_evolution)
+	hud.open_about_requested.connect(_on_open_about)
+	about_modal.closed.connect(_on_close_about)
 	evolution_screen.back_requested.connect(_on_close_evolution)
 	country_panel.closed.connect(_on_close_country_panel)
 	setup_screen.game_started.connect(_on_game_started)
@@ -33,6 +36,7 @@ func _ready():
 	country_panel.hide()
 	evolution_screen.hide()
 	game_over_modal.hide()
+	about_modal.hide()
 	setup_screen.show()
 
 func _process(delta: float):
@@ -102,6 +106,16 @@ func _on_restart_requested():
 	hud.hide_hover_info()
 	world_map.set_interactive(false)
 	setup_screen.show_cracktro()
+
+func _on_open_about():
+	if GameState.sim_speed > 0.0:
+		sim_speed_before_menu = GameState.sim_speed
+		GameState.set_sim_speed(0.0)
+	about_modal.open()
+
+func _on_close_about():
+	if sim_speed_before_menu > 0.0 and GameState.sim_speed == 0.0:
+		GameState.set_sim_speed(sim_speed_before_menu)
 
 # ─── Omarchy System Font Integration ──────────────────────────────
 # Resolves the current Omarchy monospace font (via fontconfig/omarchy font current)

@@ -230,6 +230,15 @@ theme_override_font_sizes/font_size = 13
 text = "Connecting to global satellite news wire..."
 vertical_alignment = 1
 
+[node name="BtnAbout" type="Button" parent="TopBar/Margin/HBox"]
+custom_minimum_size = Vector2(86, 34)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "About Tony the Pony & Omaplague"
+theme_override_colors/font_color = Color(0.95, 0.75, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "🐴 ABOUT"
+
 [node name="BottomBar" type="Panel" parent="."]
 custom_minimum_size = Vector2(0, 68)
 anchors_preset = 12

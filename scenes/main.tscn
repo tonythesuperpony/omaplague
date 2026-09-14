@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/evolution_screen.tscn" id="5_evol"]
 [ext_resource type="PackedScene" path="res://scenes/setup_screen.tscn" id="6_setup"]
 [ext_resource type="PackedScene" path="res://scenes/game_over_modal.tscn" id="7_modal"]
+[ext_resource type="PackedScene" path="res://scenes/about_modal.tscn" id="8_about"]
 
 [node name="Main" type="Node"]
 script = ExtResource("1_main")
@@ -24,4 +25,7 @@ visible = false
 [node name="SetupScreen" parent="." instance=ExtResource("6_setup")]
 
 [node name="GameOverModal" parent="." instance=ExtResource("7_modal")]
+visible = false
+
+[node name="AboutModal" parent="." instance=ExtResource("8_about")]
 visible = false

@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal open_evolution_requested()
 signal open_world_requested()
+signal open_about_requested()
 
 @onready var date_label: Label = $TopBar/Margin/HBox/DateLabel
 @onready var news_container: PanelContainer = $TopBar/Margin/HBox/NewsContainer
@@ -13,6 +14,7 @@ signal open_world_requested()
 @onready var btn_1x: Button = $TopBar/Margin/HBox/SpeedBox/Btn1x
 @onready var btn_2x: Button = $TopBar/Margin/HBox/SpeedBox/Btn2x
 @onready var btn_3x: Button = $TopBar/Margin/HBox/SpeedBox/Btn3x
+@onready var btn_about: Button = $TopBar/Margin/HBox/BtnAbout
 
 @onready var btn_disease: Button = $BottomBar/Margin/HBox/BtnDisease
 @onready var btn_pop_all: Button = $BottomBar/Margin/HBox/BtnPopAll
@@ -164,6 +166,7 @@ func _ready():
 	btn_disease.pressed.connect(func(): open_evolution_requested.emit())
 	btn_pop_all.pressed.connect(_on_pop_all_pressed)
 	btn_spore.pressed.connect(_on_spore_pressed)
+	btn_about.pressed.connect(func(): open_about_requested.emit())
 	
 	hover_card.hide()
 	
