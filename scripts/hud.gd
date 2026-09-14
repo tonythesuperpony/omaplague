@@ -295,28 +295,27 @@ func _start_next_breaking_news():
 	current_news_mode = NewsMode.BREAKING_ALERT
 	var raw_headline = breaking_queue.pop_front()
 	
-	# Determine context-aware icon
-	var icon = "🚨"
+	# Determine context-aware prefix label and its emoji bookend
+	var prefix = "🚨 BREAKING NEWS:"
+	var emoji = "🚨"
 	var lower = raw_headline.to_lower()
 	if "airport" in lower:
-		icon = "✈️ AIRPORT CLOSURE:"
+		prefix = "✈️ AIRPORT CLOSURE:"; emoji = "✈️"
 	elif "seaport" in lower or "port" in lower:
-		icon = "⚓ PORT LOCKDOWN:"
+		prefix = "⚓ PORT LOCKDOWN:"; emoji = "⚓"
 	elif "border" in lower:
-		icon = "🚧 BORDER SEALED:"
+		prefix = "🚧 BORDER SEALED:"; emoji = "🚧"
 	elif "cure" in lower:
-		icon = "🧪 CURE ALERT:"
+		prefix = "🧪 CURE ALERT:"; emoji = "🧪"
 	elif "first infection" in lower or "patient zero" in lower:
-		icon = "☣️ OUTBREAK DETECTED:"
+		prefix = "☣️ OUTBREAK DETECTED:"; emoji = "☣️"
 	elif "spore" in lower:
-		icon = "🍄 SPORE BURST:"
+		prefix = "🍄 SPORE BURST:"; emoji = "🍄"
 	elif "extinction" in lower or "defeat" in lower:
-		icon = "💀 GLOBAL CATASTROPHE:"
+		prefix = "💀 GLOBAL CATASTROPHE:"; emoji = "💀"
 	elif "mutated" in lower or "mutation" in lower:
-		icon = "🧬 VIRAL MUTATION:"
-	else:
-		icon = "🚨 BREAKING NEWS:"
-		
+		prefix = "🧬 VIRAL MUTATION:"; emoji = "🧬"
+
 	# Strip any pre-existing "Breaking News:" prefix the game may have already added
 	var clean_headline = raw_headline.strip_edges()
 	for pfx in ["Breaking News: ", "Breaking News:", "BREAKING NEWS: ", "BREAKING NEWS:", "BREAKING: "]:
@@ -324,7 +323,7 @@ func _start_next_breaking_news():
 			clean_headline = clean_headline.substr(pfx.length()).strip_edges()
 			break
 
-	breaking_text = "%s  %s  %s" % [icon, clean_headline.to_upper(), icon]
+	breaking_text = "%s  %s  %s" % [prefix, clean_headline.to_upper(), emoji]
 	news_label.text = breaking_text
 	news_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1.0))
 	
