@@ -340,7 +340,7 @@ func advance_day():
 		# Genetic hardening reduces cure speed
 		base_daily_cure *= (1.0 - active_modifiers["cure_resist"])
 		
-		var delta_cure = base_daily_cure * (research_power / 44.0)
+		var delta_cure = base_daily_cure * (research_power / max(1.0, float(country_states.size())))
 		cure_progress += delta_cure
 		
 		# Cure milestones & Blue Bubble spawning

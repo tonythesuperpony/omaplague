@@ -9,34 +9,56 @@ signal country_unhovered()
 @onready var effects_node: Node2D = $Effects
 
 # Country polygon caches
-# Structure: cid -> Array of PackedVector2Array
 var country_polys: Dictionary = {}
-# Structure: cid -> Rect2 (bounding box for ultra-fast culling)
 var country_bounds: Dictionary = {}
 
 var hovered_country_id: String = ""
 var selected_country_id: String = ""
 
 # Camera zoom & pan
-var zoom_level: float = 0.95
-var min_zoom: float = 0.65
-var max_zoom: float = 3.5
+var zoom_level: float = 0.70
+var min_zoom: float = 0.55
+var max_zoom: float = 4.0
 var is_dragging: bool = false
 var drag_start: Vector2 = Vector2.ZERO
 
 var pulse_time: float = 0.0
 const MAP_WIDTH: float = 1920.0
-const MAP_HEIGHT: float = 975.0
+const MAP_HEIGHT: float = 960.0
+
+var is_interactive: bool = false
+
+# Textures
+var map_texture: Texture2D
+var icon_plane: Texture2D
+var icon_anchor: Texture2D
+
+# Ambient traffic
+var ambient_timer: float = 0.0
+const AMBIENT_INTERVAL: float = 0.85
+
+# Scenic transit routes (sampled quadratic beziers)
+var scenic_transit_lines: Array[Array] = []
 
 func _ready():
+	# Load textures
+	if ResourceLoader.exists("res://assets/world_map_realistic.png"):
+		map_texture = load("res://assets/world_map_realistic.png")
+	if ResourceLoader.exists("res://assets/icons/airplane.png"):
+		icon_plane = load("res://assets/icons/airplane.png")
+	if ResourceLoader.exists("res://assets/icons/anchor.png"):
+		icon_anchor = load("res://assets/icons/anchor.png")
+		
 	_build_vector_cache()
+	_build_scenic_routes()
 	
 	GameState.plane_dispatched.connect(_on_plane_dispatched)
 	GameState.ship_dispatched.connect(_on_ship_dispatched)
 	GameState.bubble_spawned.connect(_on_bubble_spawned)
 	
-	# Center map initially in viewport
+	# Center map initially in viewport with responsive zoom
 	var vp_size = get_viewport_rect().size
+	zoom_level = clamp(vp_size.x / MAP_WIDTH * 1.05, 0.65, 0.85)
 	position = (vp_size - Vector2(MAP_WIDTH, MAP_HEIGHT) * zoom_level) * 0.5
 	scale = Vector2(zoom_level, zoom_level)
 
@@ -69,9 +91,51 @@ func _build_vector_cache():
 		country_polys[cid] = packed_list
 		country_bounds[cid] = Rect2(min_x, min_y, max_x - min_x, max_y - min_y)
 		
-	print("Built vector cache for %d regions" % country_polys.size())
+	print("Built vector cache for %d countries" % country_polys.size())
 
-var is_interactive: bool = false
+func _build_scenic_routes():
+	scenic_transit_lines.clear()
+	var raw_beziers = [
+		# North Atlantic (New York to London)
+		[Vector2(432, 269), Vector2(688, 170), Vector2(946, 193)],
+		# Transatlantic South (Brazil to Lisbon)
+		[Vector2(677, 538), Vector2(850, 420), Vector2(930, 260)],
+		# South Atlantic (Brazil to Cape Town)
+		[Vector2(677, 538), Vector2(880, 680), Vector2(1094, 635)],
+		# Cape Town to Mumbai (Indian Ocean)
+		[Vector2(1094, 635), Vector2(1250, 560), Vector2(1385, 358)],
+		# Cape Town to Sydney (Southern Ocean)
+		[Vector2(1094, 635), Vector2(1380, 720), Vector2(1677, 616)],
+		# Mediterranean to Red Sea / Egypt
+		[Vector2(930, 260), Vector2(1020, 300), Vector2(1119, 339)],
+		# Egypt to Mumbai (Arabian Sea)
+		[Vector2(1119, 339), Vector2(1240, 380), Vector2(1385, 358)],
+		# Mumbai to Singapore (Bay of Bengal)
+		[Vector2(1385, 358), Vector2(1440, 450), Vector2(1510, 460)],
+		# Singapore to Tokyo (East Asia)
+		[Vector2(1510, 460), Vector2(1580, 370), Vector2(1690, 288)],
+		# Singapore to Sydney
+		[Vector2(1510, 460), Vector2(1600, 520), Vector2(1677, 616)],
+		# Sydney to New Zealand
+		[Vector2(1677, 616), Vector2(1780, 670), Vector2(1869, 715)],
+		# South America Cape Horn
+		[Vector2(650, 680), Vector2(620, 780), Vector2(580, 680)],
+		# Caribbean to Panama
+		[Vector2(460, 300), Vector2(480, 380), Vector2(500, 450)],
+		# Panama to Lima/Chile
+		[Vector2(500, 450), Vector2(520, 540), Vector2(580, 680)],
+	]
+	for bez in raw_beziers:
+		var pts: Array[Vector2] = []
+		var p0 = bez[0]
+		var p1 = bez[1]
+		var p2 = bez[2]
+		for step in range(25):
+			var t = float(step) / 24.0
+			var q0 = p0.lerp(p1, t)
+			var q1 = p1.lerp(p2, t)
+			pts.append(q0.lerp(q1, t))
+		scenic_transit_lines.append(pts)
 
 func set_interactive(state: bool):
 	is_interactive = state
@@ -82,7 +146,62 @@ func set_interactive(state: bool):
 
 func _process(delta: float):
 	pulse_time += delta
+	
+	# Spawn ambient flights and ships continuously
+	ambient_timer += delta
+	if ambient_timer >= AMBIENT_INTERVAL:
+		ambient_timer = 0.0
+		_spawn_ambient_traffic()
+		
 	queue_redraw()
+
+func _spawn_ambient_traffic():
+	if DataManager.countries.is_empty():
+		return
+		
+	# Pick a random country
+	var c1 = DataManager.countries[randi() % DataManager.countries.size()]
+	var c1_id = c1.get("id", "")
+	var connections = c1.get("connections", {})
+	
+	# Decide air or sea
+	var is_sea = (randf() < 0.42 and c1.get("has_seaport", false))
+	var mode = "sea" if is_sea else "air"
+	var routes = connections.get(mode, [])
+	
+	if routes.is_empty():
+		if mode == "sea" and not connections.get("air", []).is_empty():
+			mode = "air"
+			routes = connections.get("air", [])
+		else:
+			return
+			
+	if routes.is_empty():
+		return
+		
+	var c2_id = routes[randi() % routes.size()]
+	var c2 = DataManager.get_country(c2_id)
+	if c2.is_empty():
+		return
+		
+	# Determine if infected flight/ship
+	var is_inf = false
+	if GameState.country_states.has(c1_id):
+		var state = GameState.country_states[c1_id]
+		if state["is_infected"]:
+			var inf_ratio = float(state["infected"]) / max(1.0, float(state["population"]))
+			is_inf = (randf() < clamp(inf_ratio * 4.0 + 0.15, 0.15, 0.95))
+			
+	var p1 = Vector2(c1.get("map_x", 0), c1.get("map_y", 0))
+	var p2 = Vector2(c2.get("map_x", 0), c2.get("map_y", 0))
+	if p1 == Vector2.ZERO or p2 == Vector2.ZERO:
+		return
+		
+	var script_res = load("res://scripts/transit_vehicle.gd")
+	var vehicle = Node2D.new()
+	vehicle.set_script(script_res)
+	vehicle.setup(mode, p1, p2, is_inf)
+	vehicles_node.add_child(vehicle)
 
 func _input(event: InputEvent):
 	if not is_interactive:
@@ -129,11 +248,13 @@ func _zoom_at(mouse_pos: Vector2, factor: float):
 func _clamp_position():
 	var vp_size = get_viewport_rect().size
 	var map_size = Vector2(MAP_WIDTH, MAP_HEIGHT) * zoom_level
-	# Allow some margin for panning
-	var margin_x = vp_size.x * 0.4
-	var margin_y = vp_size.y * 0.4
-	position.x = clamp(position.x, vp_size.x - map_size.x - margin_x, margin_x)
-	position.y = clamp(position.y, vp_size.y - map_size.y - margin_y, margin_y)
+	var p_min_x = vp_size.x - map_size.x - vp_size.x * 0.35
+	var p_max_x = vp_size.x * 0.35
+	position.x = clamp(position.x, min(p_min_x, p_max_x), max(p_min_x, p_max_x))
+	
+	var p_min_y = vp_size.y - map_size.y - vp_size.y * 0.35
+	var p_max_y = vp_size.y * 0.35
+	position.y = clamp(position.y, min(p_min_y, p_max_y), max(p_min_y, p_max_y))
 
 func _handle_mouse_hover(screen_pos: Vector2):
 	var world_p = (screen_pos - position) / zoom_level
@@ -146,7 +267,6 @@ func _handle_mouse_hover(screen_pos: Vector2):
 			country_unhovered.emit()
 		queue_redraw()
 	elif hovered_country_id != "":
-		# Update screen pos for tooltip
 		country_hovered.emit(hovered_country_id, screen_pos)
 
 func _handle_left_click(screen_pos: Vector2):
@@ -162,10 +282,9 @@ func _handle_left_click(screen_pos: Vector2):
 		queue_redraw()
 
 func _get_country_at_pos(p: Vector2) -> String:
-	# Check point in all country polygons with bounding-box pre-filtering
+	# Bounding-box pre-filtering for fast picking
 	for cid in country_bounds:
 		var bbox: Rect2 = country_bounds[cid]
-		# Expand bounding box slightly for easier clicking
 		if bbox.has_point(p):
 			var plist = country_polys[cid]
 			for poly in plist:
@@ -174,79 +293,135 @@ func _get_country_at_pos(p: Vector2) -> String:
 	return ""
 
 func _draw():
-	# 1. Flat dark ocean background
-	draw_rect(Rect2(0, 0, MAP_WIDTH, MAP_HEIGHT), Color(0.05, 0.08, 0.13, 1.0))
-	
-	# 2. Latitude & Longitude grid lines
-	var grid_col = Color(0.1, 0.16, 0.25, 0.4)
-	for y in [180.0, 360.0, 540.0, 720.0, 900.0]:
-		draw_line(Vector2(0, y), Vector2(MAP_WIDTH, y), grid_col, 1.0)
-	for x in [320.0, 640.0, 960.0, 1280.0, 1600.0]:
-		draw_line(Vector2(x, 0), Vector2(x, MAP_HEIGHT), grid_col, 1.0)
+	# 1. Base Map: Realistic NASA Satellite Terrain
+	if map_texture:
+		draw_texture_rect(map_texture, Rect2(0, 0, MAP_WIDTH, MAP_HEIGHT), false)
+	else:
+		draw_rect(Rect2(0, 0, MAP_WIDTH, MAP_HEIGHT), Color(0.04, 0.07, 0.12, 1.0))
 		
-	# 3. Render all country vector polygons
+	# 2. Dotted Oceanic Transit Routes (Plague Inc shipping lanes)
+	var route_dash_phase = int(pulse_time * 6.0) % 6
+	for route in scenic_transit_lines:
+		for i in range(route.size() - 1):
+			if (i + route_dash_phase) % 3 != 0:
+				draw_line(route[i], route[i+1], Color(0.85, 0.2, 0.2, 0.32), 1.3)
+				
+	# 3. Country Borders, Infections, and Hover/Selection Highlights
+	var base_border = Color(0.2, 0.42, 0.62, 0.42)
+	
 	for cid in country_polys:
 		var is_hovered = (cid == hovered_country_id)
 		var is_selected = (cid == selected_country_id)
-		
-		# Determine colors based on infection & state
-		var fill_color = Color(0.11, 0.16, 0.23, 1.0) # Base dark slate
-		var border_color = Color(0.18, 0.27, 0.38, 1.0) # Base border
-		var border_width = 1.0
-		
-		if GameState.country_states.has(cid):
-			var state = GameState.country_states[cid]
-			var pop = float(state["population"])
-			var inf_ratio = clamp(float(state["infected"]) / max(1.0, pop * 0.4), 0.0, 1.0)
-			var dead_ratio = clamp(float(state["dead"]) / max(1.0, pop), 0.0, 1.0)
-			
-			if state["infected"] > 0:
-				var inf_red = Color(0.85, 0.18, 0.18, 1.0)
-				fill_color = fill_color.lerp(inf_red, inf_ratio * 0.85 + 0.15)
-				border_color = Color(0.8, 0.2, 0.2, 0.8)
-				
-			if state["dead"] > 0:
-				var dead_black = Color(0.25, 0.06, 0.06, 1.0)
-				fill_color = fill_color.lerp(dead_black, dead_ratio)
-				
-		if is_hovered:
-			# Luminous glowing cyan hover
-			fill_color = fill_color.lerp(Color(0.12, 0.75, 0.65, 1.0), 0.55)
-			border_color = Color(0.3, 1.0, 0.8, 1.0)
-			border_width = 2.4
-		elif is_selected:
-			# Bright gold selection
-			border_color = Color(1.0, 0.85, 0.2, 1.0)
-			border_width = 2.6
-			
 		var plist = country_polys[cid]
+		
+		var has_state = GameState.country_states.has(cid)
+		var state = GameState.country_states.get(cid, {})
+		var inf = state.get("infected", 0) if has_state else 0
+		var dead = state.get("dead", 0) if has_state else 0
+		var pop = float(state.get("population", 1)) if has_state else 1.0
+		var inf_ratio = clamp(float(inf) / max(1.0, pop * 0.45), 0.0, 1.0)
+		
+		# A. Translucent red tint for infected countries
+		if inf > 0:
+			var red_tint = Color(0.85, 0.12, 0.12, clamp(inf_ratio * 0.35 + 0.08, 0.08, 0.42))
+			for poly in plist:
+				draw_colored_polygon(poly, red_tint)
+				
+		# B. Hover or Selection glowing fills
+		if is_hovered:
+			var hover_glow = Color(0.12, 0.8, 0.9, 0.38)
+			for poly in plist:
+				draw_colored_polygon(poly, hover_glow)
+		elif is_selected:
+			var sel_glow = Color(1.0, 0.85, 0.2, 0.25)
+			for poly in plist:
+				draw_colored_polygon(poly, sel_glow)
+				
+		# C. Country Borders
+		var border_color = base_border
+		var border_width = 0.9
+		
+		if is_hovered:
+			border_color = Color(0.35, 1.0, 0.95, 0.95)
+			border_width = 2.2
+		elif is_selected:
+			border_color = Color(1.0, 0.88, 0.25, 1.0)
+			border_width = 2.4
+		elif inf > 0:
+			border_color = Color(0.85, 0.25, 0.25, 0.65)
+			
 		for poly in plist:
-			draw_colored_polygon(poly, fill_color)
-			# Closed polyline for crisp border
 			var closed = PackedVector2Array(poly)
 			closed.append(poly[0])
 			draw_polyline(closed, border_color, border_width, true)
-
-	# 4. Render infection danger rings & centers
-	for cid in GameState.country_states:
-		var state = GameState.country_states[cid]
-		if state["infected"] > 0 or state["dead"] > 0:
-			var cdata = DataManager.get_country(cid)
-			var center = Vector2(cdata.get("map_x", 0), cdata.get("map_y", 0))
-			if center == Vector2.ZERO:
-				continue
-				
-			var pop = float(state["population"])
-			var inf_ratio = clamp(float(state["infected"]) / pop, 0.0, 1.0)
-			var pulse = sin(pulse_time * 4.0 + center.x * 0.1) * 0.15 + 1.0
-			var r = clamp(10.0 + log(state["infected"] + 1) * 2.0, 8.0, 36.0) * pulse
 			
-			# Outer danger halo
-			draw_circle(center, r * 1.4, Color(1.0, 0.15, 0.15, 0.25 * inf_ratio + 0.1))
-			# Pulsing ring
-			draw_arc(center, r, 0, TAU, 28, Color(1.0, 0.3, 0.3, 0.85), 1.6)
-			# Core
-			draw_circle(center, r * 0.45, Color(0.9, 0.1, 0.1, 0.8))
+		# D. Biological Infection Stipple Dots (Plague Inc virus nodes)
+		if inf > 0:
+			var cdata = DataManager.get_country(cid)
+			var stipples = cdata.get("stipple_points", [])
+			if not stipples.is_empty():
+				# Number of active dots scales with infection ratio
+				var active_dots = int(clamp(inf_ratio * float(stipples.size()) + 1.0, 1.0, float(stipples.size())))
+				var pulse = sin(pulse_time * 3.5 + float(active_dots)) * 0.2 + 0.8
+				for di in range(min(active_dots, stipples.size())):
+					var dpt = Vector2(stipples[di][0], stipples[di][1])
+					# Danger core
+					draw_circle(dpt, 1.6, Color(1.0, 0.18, 0.18, 0.9 * pulse))
+					# Halo
+					draw_circle(dpt, 3.2, Color(0.9, 0.1, 0.1, 0.28 * pulse))
+
+	# 4. Port Badges (Airports & Seaports)
+	for cid in DataManager.countries:
+		var cdata = cid
+		var c_id = cdata.get("id", "")
+		var center = Vector2(cdata.get("map_x", 0), cdata.get("map_y", 0))
+		if center == Vector2.ZERO:
+			continue
+			
+		var state = GameState.country_states.get(c_id, {})
+		var is_inf = state.get("is_infected", false)
+		var is_hov = (c_id == hovered_country_id)
+		
+		# Show badges when zoomed in or if hovered / infected / major hub
+		var should_show = (zoom_level >= 1.15 or is_hov or is_inf or cdata.get("wealth") == "rich" or cdata.get("population", 0) > 40000000)
+		if not should_show:
+			continue
+			
+		# Airport Badge
+		if cdata.get("has_airport", false) and icon_plane:
+			var air_open = state.get("airport_open", true)
+			var air_pos = center + Vector2(-9, -6)
+			var air_rect = Rect2(air_pos.x - 6, air_pos.y - 6, 12, 12)
+			
+			var bg_col = Color(0.06, 0.12, 0.18, 0.85)
+			var fg_col = Color(1.0, 1.0, 1.0, 0.95)
+			if not air_open:
+				bg_col = Color(0.6, 0.1, 0.1, 0.9)
+				fg_col = Color(1.0, 0.4, 0.4, 0.8)
+			elif is_inf:
+				bg_col = Color(0.7, 0.18, 0.18, 0.9)
+				
+			draw_rect(air_rect, bg_col, true)
+			draw_rect(air_rect, Color(0.3, 0.6, 0.8, 0.6) if air_open else Color(0.9, 0.2, 0.2, 0.8), false, 1.0)
+			draw_texture_rect(icon_plane, Rect2(air_pos.x - 4, air_pos.y - 4, 8, 8), false, fg_col)
+			
+		# Seaport Badge
+		if cdata.get("has_seaport", false) and icon_anchor:
+			var sea_open = state.get("seaport_open", true)
+			var sea_pos = center + Vector2(9, -6)
+			var sea_rect = Rect2(sea_pos.x - 6, sea_pos.y - 6, 12, 12)
+			
+			var bg_col = Color(0.06, 0.12, 0.18, 0.85)
+			var fg_col = Color(1.0, 1.0, 1.0, 0.95)
+			if not sea_open:
+				bg_col = Color(0.6, 0.1, 0.1, 0.9)
+				fg_col = Color(1.0, 0.4, 0.4, 0.8)
+			elif is_inf:
+				bg_col = Color(0.7, 0.18, 0.18, 0.9)
+				
+			draw_rect(sea_rect, bg_col, true)
+			draw_rect(sea_rect, Color(0.3, 0.6, 0.8, 0.6) if sea_open else Color(0.9, 0.2, 0.2, 0.8), false, 1.0)
+			draw_texture_rect(icon_anchor, Rect2(sea_pos.x - 4, sea_pos.y - 4, 8, 8), false, fg_col)
 
 func _on_plane_dispatched(from_id: String, to_id: String, is_infected: bool):
 	var from_data = DataManager.get_country(from_id)
