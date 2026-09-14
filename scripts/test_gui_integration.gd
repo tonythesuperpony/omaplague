@@ -102,5 +102,34 @@ func _init():
 	assert(world_map.is_interactive == true, "World map should be active again")
 	print("    Evolution screen opened and returned to map cleanly.")
 	
+	print("[9] Testing Continuous Satirical Marquee & Breaking News...")
+	hud.breaking_queue.clear()
+	hud._return_to_normal_marquee()
+	assert(hud.current_news_mode == 0, "Should be in NORMAL_MARQUEE mode")
+	assert(hud.active_items.size() == 8, "Should have 8 active marquee items seeded")
+	assert(hud.news_badge.text == " 🌐 WIRE ", "Badge should be WIRE")
+	
+	# Simulate 30 frames of continuous scrolling
+	for frame in range(30):
+		hud._process(0.016)
+	assert(hud.scroll_pos > 0, "Marquee scroll position should advance")
+	print("    Continuous marquee scrolling smoothly. Text preview: %s..." % hud.news_label.text.substr(0, 60))
+	
+	# Test breaking news event emission
+	GameState.news_added.emit("First infection of Omaplague detected in Brazil!")
+	assert(hud.current_news_mode == 1, "Should transition to BREAKING_ALERT mode on real news")
+	assert(hud.news_badge.text == " 🚨 BREAKING ", "Badge should show BREAKING alert")
+	assert("BRAZIL" in hud.news_label.text, "Breaking headline should display Brazil event")
+	print("    Breaking news interrupt triggered successfully: %s" % hud.news_label.text)
+	
+	# Simulate frames until breaking news pass finishes
+	for frame in range(2000):
+		hud._process(0.016)
+		if hud.current_news_mode == 0:
+			break
+	assert(hud.current_news_mode == 0, "Should return to NORMAL_MARQUEE after breaking news")
+	assert(hud.news_badge.text == " 🌐 WIRE ", "Badge should return to WIRE")
+	print("    Marquee resumed continuous satirical stream after breaking news!")
+	
 	print("=== ALL INTEGRATION TESTS PASSED SUCCESSFULLY! ===")
 	quit(0)

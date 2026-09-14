@@ -4,8 +4,11 @@ signal open_evolution_requested()
 signal open_world_requested()
 
 @onready var date_label: Label = $TopBar/Margin/HBox/DateLabel
-@onready var news_container: Control = $TopBar/Margin/HBox/NewsContainer
-@onready var news_label: Label = $TopBar/Margin/HBox/NewsContainer/NewsLabel
+@onready var news_container: PanelContainer = $TopBar/Margin/HBox/NewsContainer
+@onready var news_badge: Label = $TopBar/Margin/HBox/NewsContainer/Margin/HBox/NewsBadge
+@onready var news_viewport: Control = $TopBar/Margin/HBox/NewsContainer/Margin/HBox/NewsViewport
+@onready var news_label: Label = $TopBar/Margin/HBox/NewsContainer/Margin/HBox/NewsViewport/NewsLabel
+
 @onready var btn_pause: Button = $TopBar/Margin/HBox/SpeedBox/BtnPause
 @onready var btn_1x: Button = $TopBar/Margin/HBox/SpeedBox/Btn1x
 @onready var btn_2x: Button = $TopBar/Margin/HBox/SpeedBox/Btn2x
@@ -31,39 +34,102 @@ signal open_world_requested()
 @onready var hover_prompt: Label = $HoverCard/Margin/VBox/HoverPrompt
 
 # Marquee news system
+enum NewsMode {
+	NORMAL_MARQUEE,
+	BREAKING_ALERT
+}
+
+var current_news_mode: NewsMode = NewsMode.NORMAL_MARQUEE
 var breaking_queue: Array[String] = []
-var is_showing_breaking: bool = false
-var marquee_x: float = 0.0
-var marquee_speed: float = 90.0
+
+# Continuous Marquee Ribbon
+const SEPARATOR: String = "      ◆      "
+var active_items: Array[String] = []
+var scroll_pos: float = 0.0
+var marquee_speed: float = 85.0
 var funny_index: int = 0
 
+# Breaking News State
+var breaking_text: String = ""
+var breaking_x: float = 0.0
+var breaking_speed: float = 105.0
+
 var funny_news_pool: Array[String] = [
+	# Tony the Pony (Creator of Omaplague)
 	"Tony the Pony confirms: 'If your country is infected, simply run: omarchy restart shell.'",
-	"Tony the Pony releases new update for Omaplague; world scientists question his credentials.",
+	"Tony the Pony releases new update for Omaplague; world scientists question his veterinary credentials.",
 	"Tony the Pony spotted galloping across Hyprland at 240Hz with zero frame drops.",
-	"Omarchy Linux users report their system is so hardened, real biological pathogens fail to compile.",
-	"Mass panic averted as Omarchy users refuse to quarantine until all dotfiles are committed.",
 	"Tony the Pony seen in Bio-Lab drinking espresso and muttering about Wayland fractional scaling.",
-	"Omarchy developer declares global pathogen 'an undocumented feature of natural selection'.",
+	"Tony the Pony declares: 'All bugs in the pathogen simulation are intentional artistic features.'",
+	"Tony the Pony claims the cure to the pathogen is simply recompiling the kernel with -O3.",
+	"Tony the Pony awarded Nobel Prize in Pandemics; immediately devolves Insomnia for 2 DNA points.",
+	"Tony the Pony spotted fleeing to Greenland in a fishing boat; refused entry due to closed seaports.",
+	"Tony the Pony reminds citizens: 'Wash your hooves, stay hydrated, and always git push before evacuating.'",
+	"Tony the Pony voted 'Most Likely to Accidentally End Humanity in a Video Game' by 9 out of 10 doctors.",
+	"Tony the Pony rejects WHO quarantine treaty: 'My pathogen has full sudo privileges on this planet.'",
+	"Tony the Pony announces: 'Boats and airplanes now travel 10% faster thanks to Arch Linux networking optimizations.'",
+	"Tony the Pony seen debugging global infection rates using print statements in terminal.",
+	"Tony the Pony clarifies: 'No real ponies were harmed in the making of this global apocalyptic event.'",
+	"Tony the Pony spotted testing experimental vaccines on rubber ducks in his bathroom.",
+	"Tony the Pony advises world leaders: 'Have you tried turning the planet off and on again?'",
+	"Tony the Pony spotted editing DNA nucleotides directly inside Neovim with zero plugins.",
+	"Tony the Pony promises: 'If humanity survives, next update will feature hyper-realistic boat animations.'",
+
+	# Omarchy & Linux / Hacker Culture
+	"Omarchy Linux users report their system is so hardened, real biological pathogens fail to compile.",
+	"Mass panic averted as Omarchy users refuse to evacuate bunkers until all dotfiles are committed.",
+	"Omarchy developer declares global outbreak 'an undocumented feature of natural selection'.",
 	"Arch Linux user informs emergency room triage nurse: 'I use Arch, by the way.'",
-	"Tony the Pony announces: 'Next patch will add more boats and planes to the global simulation.'",
+	"Omarchy theming engine releases new biohazard palette; users praise the high contrast ratio.",
+	"Systemd service 'pandemic.service' fails with status=255; global sysadmins reboot the planet.",
+	"Scientists attempt to sandbox the disease inside Docker; container escapes and infects Iceland.",
+	"Wayland protocol committee still debating whether hand washing should be handled client-side.",
+	"Vim user quarantined for 3 weeks simply because they cannot figure out how to :wq.",
+	"Hyprland blur shader applied to biohazard microscope lenses; doctors admire the smooth aesthetic.",
+	"Local developer claims rewriting the human immune system in Rust will eliminate all coughing bugs.",
+	"Sysadmin attempts to terminate pandemic with 'killall -9 virus'; accidentally turns off sun.",
+	"Pacman -Syu accidentally upgrades human DNA to version 2.0; users report unexpected extra limbs.",
+	"Omarchy user sets wallpaper to pure void black in order to save 0.0001 watts of battery during apocalypse.",
+	"Neovim user writes 400-line Lua config to automatically track pathogen mutations in real time.",
+	"Kernel developers reject global vaccine patch: 'Does not adhere to Linux kernel coding style conventions.'",
+	"Emergency broadcast interrupted by Omarchy user asking how to center a floating window.",
+	"Global supercomputer quarantined after trying to compile Gentoo from source during outbreak.",
+
+	# Sarcastic World News & Pandemic Absurdity
 	"WHO strictly advises all citizens to avoid touching grass until further notice.",
 	"Global toilet paper reserves drop to absolute zero for no scientific reason whatsoever.",
-	"Conspiracy theorists claim pathogen was created by keyboard manufacturers to sell more switches.",
-	"World leaders hold emergency summit to debate dark mode versus light mode in quarantine bunkers.",
+	"World leaders hold emergency virtual summit to debate dark mode versus light mode in fallout bunkers.",
+	"Conspiracy theorists claim pathogen was engineered by mechanical keyboard makers to sell clicky switches.",
 	"Doctors recommend wearing two masks, three gloves, and active noise-canceling headphones.",
-	"Scientists discover opening 100 browser tabs increases ambient body temperature by 1.2 degrees.",
-	"Local man claims eating raw garlic and arguing on social media makes him completely immune.",
-	"Stock markets crash after leading tech CEO accidentally deletes production database.",
-	"International health organization urges everyone to stay inside and play more video games.",
-	"Supermarket runs out of pasta; civilization officially considered on the brink of collapse.",
-	"Tony the Pony voted 'Most Likely to Accidentally End Humanity in a Video Game'.",
-	"Meteorologists predict a 70% chance of rain and a 100% chance of impending doom."
+	"Supermarkets run out of pasta; civilization officially considered on the brink of total collapse.",
+	"Local man claims eating raw garlic and arguing on Reddit makes him 100% immune.",
+	"Scientists discover having 150 open browser tabs increases ambient body temperature by 2.4 degrees.",
+	"Stock markets crash after leading tech CEO accidentally drops production database into the Pacific Ocean.",
+	"Meteorologists predict a 70% chance of acid rain and a 100% chance of impending doom.",
+	"Global coffee shortage feared; tech workforce threatens total cessation of all cognitive activity.",
+	"World Bank introduces new global currency backed entirely by hand sanitizer and canned beans.",
+	"Astronauts on International Space Station look down at Earth and decide to cancel their return ticket.",
+	"Scientists confirm introverts have already been successfully quarantining for the past fifteen years.",
+	"Antarctica reports zero infections; local penguins express smug satisfaction to reporters.",
+	"Madagascar seals all shipping ports after hearing someone sneeze on an overseas podcast.",
+	"Greenland remains cold, isolated, and stubbornly free of disease despite all biological logic.",
+	"Self-help guru urges public to 'manifest wellness and positive cellular energy' during apocalypse.",
+	"Fast food chain unveils 'Biohazard Meal' with complimentary surgical mask and extra fries.",
+	"Gym enthusiasts spotted doing pull-ups on traffic lights as indoor fitness centers shut down."
 ]
 
 func _ready():
-	# Shuffle news pool for variety
 	funny_news_pool.shuffle()
+	
+	# Initial seed for continuous marquee ribbon (6-8 items ahead)
+	for i in range(8):
+		active_items.append(funny_news_pool[funny_index % funny_news_pool.size()])
+		funny_index += 1
+		
+	_set_badge_normal()
+	_update_marquee_text()
+	scroll_pos = 0.0
+	news_label.position.x = 0.0
 	
 	GameState.stats_updated.connect(_update_stats)
 	GameState.dna_changed.connect(_on_dna_changed)
@@ -101,58 +167,133 @@ func _ready():
 	_update_speed_buttons(1.0)
 	
 	btn_spore.visible = (GameState.disease_type == "fungus")
-	
-	# Initialize first marquee message
-	marquee_x = 20.0
-	news_label.position.x = marquee_x
-	news_label.text = "/// SELECT PATIENT ZERO ON THE WORLD MAP TO BEGIN OUTBREAK ///"
-	news_label.add_theme_color_override("font_color", Color(1.0, 0.4, 0.4, 1.0))
 
 func _process(delta: float):
-	# Marquee scrolling
-	var container_w = news_container.size.x
-	if container_w <= 10.0:
-		container_w = 400.0
+	if current_news_mode == NewsMode.NORMAL_MARQUEE:
+		# If breaking news is queued, immediately interrupt the marquee
+		if breaking_queue.size() > 0:
+			_start_next_breaking_news()
+			return
+			
+		scroll_pos += delta * marquee_speed
+		news_label.position.x = -scroll_pos
 		
-	marquee_x -= delta * marquee_speed
-	news_label.position.x = marquee_x
-	
-	# When scrolled off the left edge, load the next headline
-	if marquee_x < -news_label.size.x:
-		_load_next_headline(container_w)
+		# Seamless recycling: when the leading headline has fully scrolled off, pop and append
+		if active_items.size() > 0:
+			var leading_segment = active_items[0] + SEPARATOR
+			var leading_w = _get_text_width(leading_segment)
+			if scroll_pos >= leading_w:
+				scroll_pos -= leading_w
+				active_items.pop_front()
+				active_items.append(funny_news_pool[funny_index % funny_news_pool.size()])
+				funny_index += 1
+				_update_marquee_text()
+				news_label.position.x = -scroll_pos
+	else:
+		# BREAKING_ALERT mode: pulse badge and scroll breaking headline across viewport
+		var pulse = sin(Time.get_ticks_msec() * 0.01) * 0.5 + 0.5
+		news_badge.modulate = Color(1.0, 0.4 + pulse * 0.6, 0.4 + pulse * 0.6)
+		
+		breaking_x -= delta * breaking_speed
+		news_label.position.x = breaking_x
+		
+		var full_w = _get_text_width(breaking_text)
+		if breaking_x < -full_w - 30.0:
+			if breaking_queue.size() > 0:
+				_start_next_breaking_news()
+			else:
+				_return_to_normal_marquee()
 			
 	patient_zero_hint.visible = not GameState.patient_zero_selected
 	if patient_zero_hint.visible:
 		var a = 0.7 + sin(Time.get_ticks_msec() * 0.006) * 0.3
 		patient_zero_hint.modulate.a = a
 
-func _load_next_headline(container_w: float):
-	marquee_x = container_w + 30.0
-	news_label.position.x = marquee_x
+func _update_marquee_text():
+	news_label.text = SEPARATOR.join(active_items) + SEPARATOR
+
+func _get_text_width(txt: String) -> float:
+	var font = news_label.get_theme_font("font")
+	if font == null:
+		font = ThemeDB.fallback_font
+	var font_size = news_label.get_theme_font_size("font_size")
+	if font_size <= 0:
+		font_size = 13
+	if font != null:
+		return font.get_string_size(txt, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+	return float(txt.length()) * 8.5
+
+func _start_next_breaking_news():
+	if breaking_queue.is_empty():
+		_return_to_normal_marquee()
+		return
+		
+	current_news_mode = NewsMode.BREAKING_ALERT
+	var raw_headline = breaking_queue.pop_front()
 	
-	if breaking_queue.size() > 0:
-		is_showing_breaking = true
-		var headline = breaking_queue.pop_front()
-		news_label.text = "🚨 BREAKING NEWS: %s 🚨" % headline.to_upper()
-		news_label.add_theme_color_override("font_color", Color(1.0, 0.25, 0.25, 1.0))
-		marquee_speed = 105.0
+	# Determine context-aware icon
+	var icon = "🚨"
+	var lower = raw_headline.to_lower()
+	if "airport" in lower:
+		icon = "✈️ AIRPORT CLOSURE:"
+	elif "seaport" in lower or "port" in lower:
+		icon = "⚓ PORT LOCKDOWN:"
+	elif "border" in lower:
+		icon = "🚧 BORDER SEALED:"
+	elif "cure" in lower:
+		icon = "🧪 CURE ALERT:"
+	elif "first infection" in lower or "patient zero" in lower:
+		icon = "☣️ OUTBREAK DETECTED:"
+	elif "spore" in lower:
+		icon = "🍄 SPORE BURST:"
+	elif "extinction" in lower or "defeat" in lower:
+		icon = "💀 GLOBAL CATASTROPHE:"
+	elif "mutated" in lower or "mutation" in lower:
+		icon = "🧬 VIRAL MUTATION:"
 	else:
-		is_showing_breaking = false
-		var headline = funny_news_pool[funny_index % funny_news_pool.size()]
-		funny_index += 1
-		news_label.text = "/// %s ///" % headline
-		news_label.add_theme_color_override("font_color", Color(0.85, 0.92, 1.0, 0.95))
-		marquee_speed = 85.0
+		icon = "🚨 BREAKING NEWS:"
+		
+	breaking_text = "%s  %s  %s" % [icon, raw_headline.to_upper(), icon]
+	news_label.text = breaking_text
+	news_label.add_theme_color_override("font_color", Color(1.0, 0.35, 0.35, 1.0))
+	
+	var vp_w = news_viewport.size.x
+	if vp_w <= 10.0:
+		vp_w = 600.0
+	breaking_x = vp_w + 20.0
+	news_label.position.x = breaking_x
+	_set_badge_breaking()
+	AudioManager.play_sfx("alert")
+
+func _return_to_normal_marquee():
+	current_news_mode = NewsMode.NORMAL_MARQUEE
+	_set_badge_normal()
+	news_label.add_theme_color_override("font_color", Color(0.85, 0.94, 1.0, 0.95))
+	_update_marquee_text()
+	scroll_pos = 0.0
+	news_label.position.x = 0.0
+
+func _set_badge_normal():
+	news_badge.text = " 🌐 WIRE "
+	news_badge.modulate = Color(1.0, 1.0, 1.0, 1.0)
+	news_badge.add_theme_color_override("font_color", Color(0.36, 0.88, 0.82, 1.0))
+	var sb = news_badge.get_theme_stylebox("normal")
+	if sb is StyleBoxFlat:
+		sb.bg_color = Color(0.08, 0.15, 0.24, 0.95)
+		sb.border_color = Color(0.2, 0.4, 0.6, 0.75)
+
+func _set_badge_breaking():
+	news_badge.text = " 🚨 BREAKING "
+	news_badge.add_theme_color_override("font_color", Color(1.0, 0.95, 0.7, 1.0))
+	var sb = news_badge.get_theme_stylebox("normal")
+	if sb is StyleBoxFlat:
+		sb.bg_color = Color(0.65, 0.12, 0.12, 0.95)
+		sb.border_color = Color(0.95, 0.3, 0.3, 0.9)
 
 func _on_news_added(headline: String):
 	breaking_queue.append(headline)
-	# If currently showing idle sarcastic news, immediately cut to breaking news!
-	if not is_showing_breaking:
-		var container_w = news_container.size.x
-		if container_w <= 10.0:
-			container_w = 400.0
-		_load_next_headline(container_w)
-		AudioManager.play_sfx("alert")
+	if current_news_mode == NewsMode.NORMAL_MARQUEE:
+		_start_next_breaking_news()
 
 func show_hover_info(cid: String, screen_pos: Vector2):
 	var cdata = DataManager.get_country(cid)
