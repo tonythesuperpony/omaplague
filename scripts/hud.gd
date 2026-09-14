@@ -383,12 +383,13 @@ func _update_bubble_count(count: int):
 	if btn_pop_all:
 		if count > 0:
 			btn_pop_all.disabled = false
-			btn_pop_all.text = "💥 POP ALL (%d)" % count
+			btn_pop_all.text = "💥 POP ALL"
 			btn_pop_all.modulate.a = 1.0
 		else:
 			btn_pop_all.disabled = true
-			btn_pop_all.text = "💥 POP ALL (0)"
+			btn_pop_all.text = "💥 POP ALL"
 			btn_pop_all.modulate.a = 0.45
+
 
 func _update_speed_buttons(current_speed: float):
 	btn_pause.modulate = Color(1.3, 0.5, 0.5) if current_speed == 0.0 else Color(0.7, 0.7, 0.7)

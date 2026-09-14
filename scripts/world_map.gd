@@ -150,7 +150,7 @@ func _spawn_ambient_traffic():
 	vehicle.setup(mode, p1, p2, is_inf)
 	vehicles_node.add_child(vehicle)
 
-func _input(event: InputEvent):
+func _unhandled_input(event: InputEvent):
 	if not is_interactive:
 		if hovered_country_id != "":
 			hovered_country_id = ""
