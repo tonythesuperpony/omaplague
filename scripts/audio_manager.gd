@@ -63,7 +63,8 @@ var is_intro_music_active: bool = false
 
 func play_random_intro_music():
 	is_intro_music_active = true
-	current_track_index = randi() % intro_tracks.size()
+	# Always start with intro_3, then rotate randomly after
+	current_track_index = 2
 	_play_current_intro_track()
 
 func _play_current_intro_track():
@@ -89,8 +90,12 @@ func _play_current_intro_track():
 func _on_intro_music_finished():
 	if not is_intro_music_active:
 		return
-	# Loop to next song in rotation
-	current_track_index = (current_track_index + 1) % intro_tracks.size()
+	# Pick a random next track, avoid repeating the same one
+	var next = randi() % intro_tracks.size()
+	if intro_tracks.size() > 1:
+		while next == current_track_index:
+			next = randi() % intro_tracks.size()
+	current_track_index = next
 	print("AudioManager: intro track finished, rotating to next song: index %d" % current_track_index)
 	_play_current_intro_track()
 
@@ -102,8 +107,12 @@ func stop_intro_music(fade_out_sec: float = 1.0):
 		tween.tween_callback(music_player.stop)
 
 func skip_track():
-	# Advance to next track immediately
-	current_track_index = (current_track_index + 1) % intro_tracks.size()
+	# Skip to a random track (not the same one)
+	var next = randi() % intro_tracks.size()
+	if intro_tracks.size() > 1:
+		while next == current_track_index:
+			next = randi() % intro_tracks.size()
+	current_track_index = next
 	is_intro_music_active = true
 	if music_player and music_player.playing:
 		music_player.stop()
