@@ -11,3 +11,6 @@ mono_crash.*.json
 .DS_Store
 Thumbs.db
 *.log
+
+# Exported binaries
+build/
