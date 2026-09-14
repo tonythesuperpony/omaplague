@@ -1,0 +1,705 @@
+[
+    {
+        "id": "trans_bird_1",
+        "name": "Bird 1",
+        "category": "transmission",
+        "cost": 9,
+        "infectivity": 0.04,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "land": 1.2
+        },
+        "grid": [
+            2,
+            0
+        ],
+        "description": "Avian vectors allow pathogen to spread rapidly across land borders and rural zones."
+    },
+    {
+        "id": "trans_bird_2",
+        "name": "Bird 2",
+        "category": "transmission",
+        "cost": 14,
+        "infectivity": 0.07,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "trans_bird_1"
+        ],
+        "modifiers": {
+            "land": 1.5
+        },
+        "grid": [
+            1,
+            0
+        ],
+        "description": "Migratory birds carry pathogen across continents, dramatically increasing mutation chances."
+    },
+    {
+        "id": "trans_air_1",
+        "name": "Air 1",
+        "category": "transmission",
+        "cost": 10,
+        "infectivity": 0.05,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "urban": 1.3,
+            "arid": 1.2,
+            "air": 1.3
+        },
+        "grid": [
+            2,
+            1
+        ],
+        "description": "Pathogen spreads on dust and airborne droplets. High bonus in urban and dry regions."
+    },
+    {
+        "id": "trans_air_2",
+        "name": "Air 2",
+        "category": "transmission",
+        "cost": 16,
+        "infectivity": 0.09,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "trans_air_1"
+        ],
+        "modifiers": {
+            "urban": 1.6,
+            "arid": 1.4,
+            "air": 1.7
+        },
+        "grid": [
+            1,
+            1
+        ],
+        "description": "Organism survives for days in air suspension. Airborne transmission penetrates aircraft filters."
+    },
+    {
+        "id": "trans_water_1",
+        "name": "Water 1",
+        "category": "transmission",
+        "cost": 10,
+        "infectivity": 0.05,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "humid": 1.3,
+            "sea": 1.4
+        },
+        "grid": [
+            2,
+            2
+        ],
+        "description": "Pathogen survives in fresh and municipal water. Essential for infecting humid regions and ships."
+    },
+    {
+        "id": "trans_water_2",
+        "name": "Water 2",
+        "category": "transmission",
+        "cost": 16,
+        "infectivity": 0.09,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "trans_water_1"
+        ],
+        "modifiers": {
+            "humid": 1.6,
+            "sea": 1.8
+        },
+        "grid": [
+            1,
+            2
+        ],
+        "description": "Pathogen survives in saline maritime water. Drastically increases ship transmission."
+    },
+    {
+        "id": "trans_aerosol",
+        "name": "Extreme Bio-Aerosol",
+        "category": "transmission",
+        "cost": 26,
+        "infectivity": 0.16,
+        "severity": 0.01,
+        "lethality": 0.0,
+        "prereq": [
+            "trans_air_2",
+            "trans_water_2"
+        ],
+        "modifiers": {
+            "air": 2.2,
+            "sea": 2.2,
+            "urban": 1.8
+        },
+        "grid": [
+            0,
+            1
+        ],
+        "description": "Cellular shell allows transmission through high-grade HEPA filters and closed air-sea recirculation systems."
+    },
+    {
+        "id": "trans_rodent_1",
+        "name": "Rodent 1",
+        "category": "transmission",
+        "cost": 11,
+        "infectivity": 0.05,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "urban": 1.4,
+            "poor": 1.3
+        },
+        "grid": [
+            3,
+            0
+        ],
+        "description": "Fleas on rodents carry pathogen. Highly effective in crowded urban slums and poor regions."
+    },
+    {
+        "id": "trans_rodent_2",
+        "name": "Rodent 2",
+        "category": "transmission",
+        "cost": 17,
+        "infectivity": 0.09,
+        "severity": 0.01,
+        "lethality": 0.0,
+        "prereq": [
+            "trans_rodent_1"
+        ],
+        "modifiers": {
+            "urban": 1.8,
+            "poor": 1.6
+        },
+        "grid": [
+            4,
+            0
+        ],
+        "description": "Rats actively spread pathogen into domestic food and water storage."
+    },
+    {
+        "id": "trans_livestock_1",
+        "name": "Livestock 1",
+        "category": "transmission",
+        "cost": 8,
+        "infectivity": 0.04,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "rural": 1.4
+        },
+        "grid": [
+            3,
+            2
+        ],
+        "description": "Pathogen infects domestic cattle, sheep and pigs. Accelerates spread across rural populations."
+    },
+    {
+        "id": "trans_insect_1",
+        "name": "Insect 1",
+        "category": "transmission",
+        "cost": 11,
+        "infectivity": 0.05,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "hot": 1.5,
+            "humid": 1.3
+        },
+        "grid": [
+            4,
+            1
+        ],
+        "description": "Mosquitoes and biting insects act as active carriers. Major bonus in hot and tropical climates."
+    },
+    {
+        "id": "trans_blood_1",
+        "name": "Blood 1",
+        "category": "transmission",
+        "cost": 9,
+        "infectivity": 0.04,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "poor": 1.5
+        },
+        "grid": [
+            3,
+            1
+        ],
+        "description": "Transmitted through blood contact and medical supplies. Greatly accelerates spread in poorer regions."
+    },
+    {
+        "id": "symp_nausea",
+        "name": "Nausea",
+        "category": "symptom",
+        "cost": 3,
+        "infectivity": 0.03,
+        "severity": 0.01,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {},
+        "grid": [
+            2,
+            0
+        ],
+        "description": "Stomach lining becomes inflamed. Discomfort slightly increases infection through touch."
+    },
+    {
+        "id": "symp_cough",
+        "name": "Coughing",
+        "category": "symptom",
+        "cost": 4,
+        "infectivity": 0.05,
+        "severity": 0.01,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "urban": 1.2
+        },
+        "grid": [
+            2,
+            1
+        ],
+        "description": "Spreads thousands of infected droplets into the air. Major increase to infectivity."
+    },
+    {
+        "id": "symp_rash",
+        "name": "Rash",
+        "category": "symptom",
+        "cost": 3,
+        "infectivity": 0.03,
+        "severity": 0.01,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {},
+        "grid": [
+            2,
+            2
+        ],
+        "description": "Skin breaks out in painful lesions. Increases infectivity through skin contact."
+    },
+    {
+        "id": "symp_insomnia",
+        "name": "Insomnia",
+        "category": "symptom",
+        "cost": 5,
+        "infectivity": 0.02,
+        "severity": 0.03,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {},
+        "grid": [
+            1,
+            0
+        ],
+        "description": "Victims cannot sleep, causing fatigue, reduced immune defense and paranoia."
+    },
+    {
+        "id": "symp_sneezing",
+        "name": "Sneezing",
+        "category": "symptom",
+        "cost": 6,
+        "infectivity": 0.07,
+        "severity": 0.02,
+        "lethality": 0.0,
+        "prereq": [
+            "symp_cough"
+        ],
+        "modifiers": {
+            "urban": 1.3
+        },
+        "grid": [
+            1,
+            1
+        ],
+        "description": "Violent sneezes project aerosol droplets across rooms. Massive infectivity boost."
+    },
+    {
+        "id": "symp_cysts",
+        "name": "Cysts",
+        "category": "symptom",
+        "cost": 5,
+        "infectivity": 0.04,
+        "severity": 0.02,
+        "lethality": 0.0,
+        "prereq": [
+            "symp_rash"
+        ],
+        "modifiers": {},
+        "grid": [
+            1,
+            2
+        ],
+        "description": "Subcutaneous nodules full of pathogen that can burst and spread infection."
+    },
+    {
+        "id": "symp_vomiting",
+        "name": "Vomiting",
+        "category": "symptom",
+        "cost": 7,
+        "infectivity": 0.06,
+        "severity": 0.03,
+        "lethality": 0.01,
+        "prereq": [
+            "symp_nausea"
+        ],
+        "modifiers": {},
+        "grid": [
+            3,
+            0
+        ],
+        "description": "Violent expulsion of infected stomach bile. Significant infectivity boost."
+    },
+    {
+        "id": "symp_fever",
+        "name": "Fever",
+        "category": "symptom",
+        "cost": 10,
+        "infectivity": 0.06,
+        "severity": 0.05,
+        "lethality": 0.03,
+        "prereq": [
+            "symp_cough"
+        ],
+        "modifiers": {},
+        "grid": [
+            3,
+            1
+        ],
+        "description": "Dangerous body temperature spike. Can cause delirium and early fatalities."
+    },
+    {
+        "id": "symp_lesions",
+        "name": "Skin Lesions",
+        "category": "symptom",
+        "cost": 11,
+        "infectivity": 0.08,
+        "severity": 0.04,
+        "lethality": 0.02,
+        "prereq": [
+            "symp_cysts"
+        ],
+        "modifiers": {},
+        "grid": [
+            3,
+            2
+        ],
+        "description": "Open sores weeping pathogen fluids. Substantially increases infectivity."
+    },
+    {
+        "id": "symp_edema",
+        "name": "Pulmonary Edema",
+        "category": "symptom",
+        "cost": 15,
+        "infectivity": 0.07,
+        "severity": 0.08,
+        "lethality": 0.06,
+        "prereq": [
+            "symp_sneezing",
+            "symp_fever"
+        ],
+        "modifiers": {},
+        "grid": [
+            0,
+            1
+        ],
+        "description": "Lungs fill with fluid, causing suffocating coughs and fatal hypoxia."
+    },
+    {
+        "id": "symp_necrosis",
+        "name": "Necrosis",
+        "category": "symptom",
+        "cost": 25,
+        "infectivity": 0.1,
+        "severity": 0.12,
+        "lethality": 0.15,
+        "prereq": [
+            "symp_lesions",
+            "symp_fever"
+        ],
+        "modifiers": {},
+        "grid": [
+            4,
+            2
+        ],
+        "description": "Large swathes of flesh rot while host lives. Gangrenous tissue spreads pathogen violently."
+    },
+    {
+        "id": "symp_dysentery",
+        "name": "Dysentery",
+        "category": "symptom",
+        "cost": 20,
+        "infectivity": 0.09,
+        "severity": 0.1,
+        "lethality": 0.09,
+        "prereq": [
+            "symp_vomiting"
+        ],
+        "modifiers": {},
+        "grid": [
+            4,
+            0
+        ],
+        "description": "Complete gastrointestinal collapse and fatal dehydration. Spreads into water supplies."
+    },
+    {
+        "id": "symp_organ_failure",
+        "name": "Total Organ Failure",
+        "category": "symptom",
+        "cost": 32,
+        "infectivity": 0.05,
+        "severity": 0.2,
+        "lethality": 0.35,
+        "prereq": [
+            "symp_edema",
+            "symp_fever"
+        ],
+        "modifiers": {},
+        "grid": [
+            0,
+            2
+        ],
+        "description": "Catastrophic cellular shutdown across liver, kidneys and heart. Causes rapid mass mortality."
+    },
+    {
+        "id": "symp_coma",
+        "name": "Coma",
+        "category": "symptom",
+        "cost": 24,
+        "infectivity": 0.02,
+        "severity": 0.15,
+        "lethality": 0.12,
+        "prereq": [
+            "symp_insomnia"
+        ],
+        "modifiers": {},
+        "grid": [
+            0,
+            0
+        ],
+        "description": "Loss of consciousness and brainstem swelling. Severely halts hospital cure research."
+    },
+    {
+        "id": "abil_cold_1",
+        "name": "Cold Resistance 1",
+        "category": "ability",
+        "cost": 8,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "cold": 1.6
+        },
+        "grid": [
+            2,
+            0
+        ],
+        "description": "Pathogen develops outer lipid membrane to thrive in freezing temperatures (Greenland, Canada, Russia)."
+    },
+    {
+        "id": "abil_cold_2",
+        "name": "Cold Resistance 2",
+        "category": "ability",
+        "cost": 15,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "abil_cold_1"
+        ],
+        "modifiers": {
+            "cold": 2.4
+        },
+        "grid": [
+            1,
+            0
+        ],
+        "description": "Cellular antifreezing proteins ensure complete immunity to Arctic and sub-zero climates."
+    },
+    {
+        "id": "abil_heat_1",
+        "name": "Heat Resistance 1",
+        "category": "ability",
+        "cost": 8,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "hot": 1.6
+        },
+        "grid": [
+            2,
+            2
+        ],
+        "description": "Pathogen survives high temperatures and desiccation in arid African and Middle Eastern zones."
+    },
+    {
+        "id": "abil_heat_2",
+        "name": "Heat Resistance 2",
+        "category": "ability",
+        "cost": 15,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "abil_heat_1"
+        ],
+        "modifiers": {
+            "hot": 2.4
+        },
+        "grid": [
+            1,
+            2
+        ],
+        "description": "Heat-shock proteins allow rapid propagation even under scorching desert sun."
+    },
+    {
+        "id": "abil_env_hard",
+        "name": "Environmental Hardening",
+        "category": "ability",
+        "cost": 26,
+        "infectivity": 0.05,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "abil_cold_2",
+            "abil_heat_2"
+        ],
+        "modifiers": {
+            "cold": 2.8,
+            "hot": 2.8,
+            "arid": 2.0,
+            "humid": 2.0
+        },
+        "grid": [
+            0,
+            1
+        ],
+        "description": "Indestructible protein coat allows survival in any climate on Earth."
+    },
+    {
+        "id": "abil_drug_1",
+        "name": "Drug Resistance 1",
+        "category": "ability",
+        "cost": 12,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "rich": 1.7
+        },
+        "grid": [
+            3,
+            1
+        ],
+        "description": "Resists first-line antibiotics and sanitizers. Crucial to spread in rich nations (USA, Europe, Japan)."
+    },
+    {
+        "id": "abil_drug_2",
+        "name": "Drug Resistance 2",
+        "category": "ability",
+        "cost": 22,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "abil_drug_1"
+        ],
+        "modifiers": {
+            "rich": 2.6
+        },
+        "grid": [
+            4,
+            1
+        ],
+        "description": "Neutralizes advanced anti-viral therapies. Wealthy countries can no longer suppress spread."
+    },
+    {
+        "id": "abil_gen_hard_1",
+        "name": "Genetic Hardening 1",
+        "category": "ability",
+        "cost": 10,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "cure_resist": 0.25
+        },
+        "grid": [
+            2,
+            1
+        ],
+        "description": "Pathogen DNA is difficult to sequence in laboratory centrifuges. Slows cure research by 25%."
+    },
+    {
+        "id": "abil_gen_hard_2",
+        "name": "Genetic Hardening 2",
+        "category": "ability",
+        "cost": 18,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "abil_gen_hard_1"
+        ],
+        "modifiers": {
+            "cure_resist": 0.4
+        },
+        "grid": [
+            1,
+            1
+        ],
+        "description": "Complex chromosomal repeats baffle global researchers. Slows cure research by an additional 40%."
+    },
+    {
+        "id": "abil_gen_reshuf_1",
+        "name": "Genetic Reshuffle 1",
+        "category": "ability",
+        "cost": 14,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [],
+        "modifiers": {
+            "cure_setback": 0.15
+        },
+        "grid": [
+            3,
+            0
+        ],
+        "description": "Rearranges pathogen base pairs. Resets active global cure progress by 15%!"
+    },
+    {
+        "id": "abil_gen_reshuf_2",
+        "name": "Genetic Reshuffle 2",
+        "category": "ability",
+        "cost": 22,
+        "infectivity": 0.0,
+        "severity": 0.0,
+        "lethality": 0.0,
+        "prereq": [
+            "abil_gen_reshuf_1"
+        ],
+        "modifiers": {
+            "cure_setback": 0.2
+        },
+        "grid": [
+            4,
+            0
+        ],
+        "description": "Radically alters cell receptors. Resets active global cure progress by 20%!"
+    }
+]

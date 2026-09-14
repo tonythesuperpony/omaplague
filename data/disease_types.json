@@ -1,0 +1,57 @@
+[
+    {
+        "id": "bacteria",
+        "name": "Bacteria",
+        "description": "The most common cause of plagues. Standard resilience, reliable, and solid base resistance.",
+        "base_infectivity": 0.04,
+        "base_severity": 0.0,
+        "base_lethality": 0.0,
+        "mutation_rate": 0.02,
+        "devolve_cost": 0,
+        "color": "#ff4757"
+    },
+    {
+        "id": "virus",
+        "name": "Virus",
+        "description": "Rapidly mutating pathogen that is difficult to control. Mutates symptoms randomly for free! Devolving costs DNA.",
+        "base_infectivity": 0.06,
+        "base_severity": 0.01,
+        "base_lethality": 0.0,
+        "mutation_rate": 0.12,
+        "devolve_cost": 5,
+        "color": "#ffa502"
+    },
+    {
+        "id": "fungus",
+        "name": "Fungus",
+        "description": "Fungal spores struggle to travel long distances via planes, but has Spore Burst ability to instantly infect random countries!",
+        "base_infectivity": 0.03,
+        "base_severity": 0.0,
+        "base_lethality": 0.0,
+        "mutation_rate": 0.01,
+        "devolve_cost": 1,
+        "color": "#2ed573"
+    },
+    {
+        "id": "parasite",
+        "name": "Parasite",
+        "description": "Parasitic lifestyle prevents DNA synthesis from normal infection, but is extremely stealthy and avoids human detection.",
+        "base_infectivity": 0.05,
+        "base_severity": 0.0,
+        "base_lethality": 0.0,
+        "mutation_rate": 0.03,
+        "devolve_cost": 0,
+        "color": "#9b59b6"
+    },
+    {
+        "id": "nanovirus",
+        "name": "Nano-Virus",
+        "description": "Out of control microscopic machine. Humanity has detected the lab breach: Cure research begins IMMEDIATELY on day 1!",
+        "base_infectivity": 0.09,
+        "base_severity": 0.05,
+        "base_lethality": 0.01,
+        "mutation_rate": 0.05,
+        "devolve_cost": 0,
+        "color": "#00d2d3"
+    }
+]

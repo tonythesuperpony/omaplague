@@ -1,0 +1,183 @@
+[gd_scene load_steps=5 format=3 uid="uid://ccountrypanel123"]
+
+[ext_resource type="Script" path="res://scripts/country_panel.gd" id="1_cpanel"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.06, 0.09, 0.14, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.35, 0.5, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inf"]
+bg_color = Color(0.9, 0.2, 0.2, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dead"]
+bg_color = Color(0.4, 0.05, 0.05, 1)
+
+[node name="CountryPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(380, 420)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -210.0
+offset_right = 190.0
+offset_bottom = 210.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("1_cpanel")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 20
+text = "UNITED STATES"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="PopGrid" type="GridContainer" parent="Margin/VBox"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 4
+
+[node name="PopTitle" type="Label" parent="Margin/VBox/PopGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.8, 1)
+text = "Total Population:"
+
+[node name="PopVal" type="Label" parent="Margin/VBox/PopGrid"]
+layout_mode = 2
+text = "335,000,000"
+
+[node name="InfTitle" type="Label" parent="Margin/VBox/PopGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+text = "Infected:"
+
+[node name="InfVal" type="Label" parent="Margin/VBox/PopGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+text = "0 (0%)"
+
+[node name="DeadTitle" type="Label" parent="Margin/VBox/PopGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.2, 0.2, 1)
+text = "Dead:"
+
+[node name="DeadVal" type="Label" parent="Margin/VBox/PopGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.2, 0.2, 1)
+text = "0 (0%)"
+
+[node name="HealthyTitle" type="Label" parent="Margin/VBox/PopGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.9, 0.6, 1)
+text = "Healthy:"
+
+[node name="HealthyVal" type="Label" parent="Margin/VBox/PopGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.9, 0.6, 1)
+text = "335,000,000"
+
+[node name="InfBar" type="ProgressBar" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_inf")
+show_percentage = false
+
+[node name="DeadBar" type="ProgressBar" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 10)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_dead")
+show_percentage = false
+
+[node name="HSeparator2" type="HSeparator" parent="Margin/VBox"]
+layout_mode = 2
+
+[node name="AttrGrid" type="GridContainer" parent="Margin/VBox"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 4
+
+[node name="ClimateTitle" type="Label" parent="Margin/VBox/AttrGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 1)
+text = "Climate:"
+
+[node name="ClimateVal" type="Label" parent="Margin/VBox/AttrGrid"]
+layout_mode = 2
+text = "Balanced"
+
+[node name="HumidityTitle" type="Label" parent="Margin/VBox/AttrGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 1)
+text = "Humidity:"
+
+[node name="HumidityVal" type="Label" parent="Margin/VBox/AttrGrid"]
+layout_mode = 2
+text = "Balanced"
+
+[node name="WealthTitle" type="Label" parent="Margin/VBox/AttrGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 1)
+text = "Wealth:"
+
+[node name="WealthVal" type="Label" parent="Margin/VBox/AttrGrid"]
+layout_mode = 2
+text = "Rich"
+
+[node name="DensityTitle" type="Label" parent="Margin/VBox/AttrGrid"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.8, 1)
+text = "Density:"
+
+[node name="DensityVal" type="Label" parent="Margin/VBox/AttrGrid"]
+layout_mode = 2
+text = "Urban"
+
+[node name="TransitHBox" type="HBoxContainer" parent="Margin/VBox"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
+
+[node name="AirStatus" type="Label" parent="Margin/VBox/TransitHBox"]
+layout_mode = 2
+text = "Air: OPEN"
+
+[node name="SeaStatus" type="Label" parent="Margin/VBox/TransitHBox"]
+layout_mode = 2
+text = "Sea: OPEN"
+
+[node name="LandStatus" type="Label" parent="Margin/VBox/TransitHBox"]
+layout_mode = 2
+text = "Land: OPEN"
+
+[node name="BtnClose" type="Button" parent="Margin/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+size_flags_vertical = 10
+text = "CLOSE"

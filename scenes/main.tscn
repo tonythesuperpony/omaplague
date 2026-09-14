@@ -1,0 +1,27 @@
+[gd_scene load_steps=8 format=3 uid="uid://cx4x0q301qj8a"]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/world_map.tscn" id="2_map"]
+[ext_resource type="PackedScene" path="res://scenes/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/country_panel.tscn" id="4_cpanel"]
+[ext_resource type="PackedScene" path="res://scenes/evolution_screen.tscn" id="5_evol"]
+[ext_resource type="PackedScene" path="res://scenes/setup_screen.tscn" id="6_setup"]
+[ext_resource type="PackedScene" path="res://scenes/game_over_modal.tscn" id="7_modal"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+
+[node name="WorldMap" parent="." instance=ExtResource("2_map")]
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]
+
+[node name="CountryPanel" parent="." instance=ExtResource("4_cpanel")]
+visible = false
+
+[node name="EvolutionScreen" parent="." instance=ExtResource("5_evol")]
+visible = false
+
+[node name="SetupScreen" parent="." instance=ExtResource("6_setup")]
+
+[node name="GameOverModal" parent="." instance=ExtResource("7_modal")]
+visible = false
