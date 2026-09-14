@@ -49,13 +49,13 @@ var breaking_queue: Array[String] = []
 const SEPARATOR: String = "   ◆   "
 var active_items: Array[String] = []
 var scroll_pos: float = 0.0
-var marquee_speed: float = 85.0
+var marquee_speed: float = 72.0
 var funny_index: int = 0
 
 # Breaking News State
 var breaking_text: String = ""
 var breaking_x: float = 0.0
-var breaking_speed: float = 145.0
+var breaking_speed: float = 115.0
 
 var funny_news_pool: Array[String] = [
 	# Tony the Pony (Creator of Omaplague)
