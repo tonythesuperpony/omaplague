@@ -460,6 +460,7 @@ func _on_bubble_tree_exited():
 
 func _notify_bubble_count():
 	var count = get_active_bubble_count()
+	GameState.live_bubble_count = count
 	GameState.bubble_count_changed.emit(count)
 
 func get_active_bubble_count() -> int:

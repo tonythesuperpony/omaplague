@@ -12,6 +12,9 @@ signal speed_changed(new_speed: float)
 signal bubble_count_changed(new_count: int)
 signal pop_all_bubbles_requested()
 
+# Tracked externally by world_map; advance_day reads this to cap bubble spawns
+var live_bubble_count: int = 0
+
 # Game configuration
 var disease_name: String = "Omaplague"
 var disease_type: String = "bacteria"
@@ -132,6 +135,7 @@ func setup_new_game(p_name: String, p_type: String, p_diff: String):
 	game_over = false
 	patient_zero_selected = false
 	set_sim_speed(1.0)
+	live_bubble_count = 0
 	
 	# Difficulty starting bonus/penalty
 	if difficulty == "casual":
@@ -330,9 +334,11 @@ func advance_day():
 							infect_country(target_id, "sea")
 							
 			# Periodic orange DNA bubble spawn
-			if randf() < 0.008:
+			# Rate is divided by sim_speed so fast-forward doesn't flood the screen.
+			# Also skip if we already have too many live bubbles.
+			var dna_spawn_chance = 0.008 / max(1.0, sim_speed)
+			if live_bubble_count < 8 and randf() < dna_spawn_chance:
 				var pos = Vector2(cdata.get("map_x", 600), cdata.get("map_y", 300))
-				# Offset slightly
 				pos += Vector2(randf_range(-25, 25), randf_range(-25, 25))
 				bubble_spawned.emit("dna", pos, cid)
 
@@ -372,7 +378,8 @@ func advance_day():
 		cure_progress += delta_cure
 		
 		# Cure milestones & Blue Bubble spawning
-		if randf() < 0.02 and cure_progress > 0.15:
+		var cure_spawn_chance = 0.02 / max(1.0, sim_speed)
+		if live_bubble_count < 8 and randf() < cure_spawn_chance and cure_progress > 0.15:
 			# Pick a leading research country
 			var candidates = ["USA", "GBR", "DEU", "FRA", "JPN", "CHN"]
 			var host = candidates[randi() % candidates.size()]

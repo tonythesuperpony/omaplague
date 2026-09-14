@@ -323,7 +323,7 @@ layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn_intro")
 theme_override_font_sizes/font_size = 12
-text = "← DEMO INTRO"
+text = "← Back"
 
 [node name="HSeparator" type="HSeparator" parent="SetupUI/Panel/Margin/VBox"]
 layout_mode = 2
