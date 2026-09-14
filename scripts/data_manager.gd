@@ -4,6 +4,7 @@ var countries: Array = []
 var upgrades: Array = []
 var disease_types: Array = []
 var news_headlines: Array = []
+var country_polygons: Dictionary = {}
 
 var country_by_id: Dictionary = {}
 var country_by_idx: Dictionary = {}
@@ -14,6 +15,7 @@ func _ready():
 	_load_upgrades()
 	_load_disease_types()
 	_load_news()
+	_load_polygons()
 
 func _load_countries():
 	var file = FileAccess.open("res://data/countries.json", FileAccess.READ)
@@ -60,6 +62,18 @@ func _load_news():
 			news_headlines = json.get_data()
 			print("Loaded %d news headlines" % news_headlines.size())
 		file.close()
+
+func _load_polygons():
+	var file = FileAccess.open("res://data/country_polygons.json", FileAccess.READ)
+	if file:
+		var json = JSON.new()
+		if json.parse(file.get_as_text()) == OK:
+			country_polygons = json.get_data()
+			print("Loaded vector polygons for %d countries" % country_polygons.size())
+		file.close()
+
+func get_country_polygons(id: String) -> Array:
+	return country_polygons.get(id, [])
 
 func get_country(id: String) -> Dictionary:
 	return country_by_id.get(id, {})

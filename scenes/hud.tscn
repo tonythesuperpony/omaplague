@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://chudscene12345"]
+[gd_scene load_steps=9 format=3 uid="uid://chudscene12345"]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
 [ext_resource type="Texture2D" path="res://assets/icons/biohazard.png" id="2_bio"]
@@ -23,6 +23,18 @@ corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hint"]
 bg_color = Color(0.8, 0.1, 0.1, 0.85)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover"]
+bg_color = Color(0.06, 0.09, 0.15, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.8, 0.7, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -62,31 +74,31 @@ vertical_alignment = 1
 
 [node name="SpeedBox" type="HBoxContainer" parent="TopBar/Margin/HBox"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="BtnPause" type="Button" parent="TopBar/Margin/HBox/SpeedBox"]
-custom_minimum_size = Vector2(34, 30)
+custom_minimum_size = Vector2(36, 34)
 layout_mode = 2
 size_flags_vertical = 4
-text = "||"
+tooltip_text = "Pause Simulation"
 
 [node name="Btn1x" type="Button" parent="TopBar/Margin/HBox/SpeedBox"]
-custom_minimum_size = Vector2(34, 30)
+custom_minimum_size = Vector2(36, 34)
 layout_mode = 2
 size_flags_vertical = 4
-text = ">"
+tooltip_text = "Normal Speed (1x)"
 
 [node name="Btn2x" type="Button" parent="TopBar/Margin/HBox/SpeedBox"]
-custom_minimum_size = Vector2(34, 30)
+custom_minimum_size = Vector2(36, 34)
 layout_mode = 2
 size_flags_vertical = 4
-text = ">>"
+tooltip_text = "Fast Speed (2x)"
 
 [node name="Btn3x" type="Button" parent="TopBar/Margin/HBox/SpeedBox"]
-custom_minimum_size = Vector2(38, 30)
+custom_minimum_size = Vector2(36, 34)
 layout_mode = 2
 size_flags_vertical = 4
-text = ">>>"
+tooltip_text = "Ultra Speed (4x)"
 
 [node name="NewsContainer" type="PanelContainer" parent="TopBar/Margin/HBox"]
 layout_mode = 2
@@ -225,6 +237,7 @@ size_flags_vertical = 4
 show_percentage = false
 
 [node name="PatientZeroHint" type="Panel" parent="."]
+mouse_filter = 2
 custom_minimum_size = Vector2(460, 38)
 anchors_preset = 5
 anchor_left = 0.5
@@ -248,6 +261,57 @@ theme_override_font_sizes/font_size = 15
 text = "CLICK ANY COUNTRY TO SELECT PATIENT ZERO"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="HoverCard" type="PanelContainer" parent="."]
+visible = false
+mouse_filter = 2
+custom_minimum_size = Vector2(250, 110)
+offset_right = 250.0
+offset_bottom = 110.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_hover")
+
+[node name="Margin" type="MarginContainer" parent="HoverCard"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="HoverCard/Margin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="HoverTitle" type="Label" parent="HoverCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.9, 0.8, 1)
+theme_override_font_sizes/font_size = 15
+text = "UNITED STATES"
+
+[node name="HoverPop" type="Label" parent="HoverCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
+theme_override_font_sizes/font_size = 13
+text = "Population: 335,000,000"
+
+[node name="HoverTraits" type="Label" parent="HoverCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+text = "Balanced | Rich | Urban"
+
+[node name="HoverStatus" type="Label" parent="HoverCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "Status: Healthy"
+
+[node name="HoverPrompt" type="Label" parent="HoverCard/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 11
+text = "[CLICK TO INFECT PATIENT ZERO]"
 
 [node name="BtnSpore" type="Button" parent="."]
 visible = false

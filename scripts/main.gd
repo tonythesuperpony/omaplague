@@ -11,6 +11,8 @@ var sim_timer: float = 0.0
 
 func _ready():
 	world_map.country_selected.connect(_on_country_selected)
+	world_map.country_hovered.connect(func(cid, pos): hud.show_hover_info(cid, pos))
+	world_map.country_unhovered.connect(func(): hud.hide_hover_info())
 	hud.open_evolution_requested.connect(_on_open_evolution)
 	evolution_screen.back_requested.connect(_on_close_evolution)
 	setup_screen.game_started.connect(_on_game_started)
