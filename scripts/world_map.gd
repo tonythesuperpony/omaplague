@@ -22,6 +22,10 @@ var min_zoom: float = 0.55
 var max_zoom: float = 4.0
 var is_dragging: bool = false
 var drag_start: Vector2 = Vector2.ZERO
+var lmb_down: bool = false
+var lmb_down_pos: Vector2 = Vector2.ZERO
+var lmb_drag_active: bool = false
+const DRAG_THRESHOLD: float = 4.0
 
 var pulse_time: float = 0.0
 const MAP_WIDTH: float = 1920.0
@@ -158,29 +162,46 @@ func _unhandled_input(event: InputEvent):
 			queue_redraw()
 		return
 
-	# Pan with right mouse or middle click
+	# Middle-click drag (keep for power users)
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_RIGHT or event.button_index == MOUSE_BUTTON_MIDDLE:
+		if event.button_index == MOUSE_BUTTON_MIDDLE:
 			if event.pressed:
 				is_dragging = true
 				drag_start = event.position - position
 			else:
 				is_dragging = false
-				
-		# Zoom with mouse wheel
+
+		# Zoom with scroll wheel only
 		elif event.button_index == MOUSE_BUTTON_WHEEL_UP and event.pressed:
 			_zoom_at(event.position, 1.15)
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN and event.pressed:
 			_zoom_at(event.position, 0.87)
-			
-		elif event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			if not event.is_echo():
-				_handle_left_click(event.position)
-			
+
+		# Left mouse: drag on empty space, click on country/bubble
+		elif event.button_index == MOUSE_BUTTON_LEFT:
+			if event.pressed:
+				lmb_down = true
+				lmb_drag_active = false
+				lmb_down_pos = event.position
+				drag_start = event.position - position
+			else:
+				if lmb_down and not lmb_drag_active and not event.is_echo():
+					# Was a tap, not a drag — handle as click
+					_handle_left_click(event.position)
+				lmb_down = false
+				lmb_drag_active = false
+
 	elif event is InputEventMouseMotion:
 		if is_dragging:
 			position = event.position - drag_start
 			_clamp_position()
+		elif lmb_down:
+			if lmb_drag_active:
+				position = event.position - drag_start
+				_clamp_position()
+			elif event.position.distance_to(lmb_down_pos) > DRAG_THRESHOLD:
+				# Crossed threshold — commit to drag
+				lmb_drag_active = true
 		else:
 			_handle_mouse_hover(event.position)
 
