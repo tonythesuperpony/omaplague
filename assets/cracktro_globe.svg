@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -24 48 48" width="512" height="512">
+<defs>
+  <radialGradient id="globe-body" cx="38%" cy="32%" r="68%">
+    <stop offset="0%" stop-color="#ff4444"/>
+    <stop offset="35%" stop-color="#c41212"/>
+    <stop offset="75%" stop-color="#4d0505"/>
+    <stop offset="100%" stop-color="#140000"/>
+  </radialGradient>
+</defs>
+
+<!-- Outer High-Tech Bezel -->
+<circle r="19.5" fill="#04070f" stroke="#000000" stroke-width="2.5"/>
+<circle r="18.5" fill="none" stroke="#ff3333" stroke-width="1.0"/>
+<circle r="17.5" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.9"/>
+
+<!-- 3D Spherical Red Globe Body -->
+<circle r="17.0" fill="url(#globe-body)"/>
+
+<!-- Wireframe Latitude lines -->
+<g stroke="#ff7777" stroke-width="0.45" fill="none" opacity="0.65">
+  <ellipse cx="0" cy="0" rx="17.0" ry="17.0"/>
+  <ellipse cx="0" cy="0" rx="16.6" ry="11.0"/>
+  <ellipse cx="0" cy="0" rx="15.2" ry="5.5"/>
+  <line x1="-17.0" y1="0" x2="17.0" y2="0"/>
+  <ellipse cx="0" cy="-6.5" rx="15.5" ry="4.0"/>
+  <ellipse cx="0" cy="6.5" rx="15.5" ry="4.0"/>
+</g>
+
+<!-- Wireframe Longitude curves -->
+<g stroke="#ff7777" stroke-width="0.45" fill="none" opacity="0.65">
+  <ellipse cx="0" cy="0" rx="5.8" ry="17.0"/>
+  <ellipse cx="0" cy="0" rx="11.6" ry="17.0"/>
+  <line x1="0" y1="-17.0" x2="0" y2="17.0"/>
+</g>
+
+<!-- Tactical Silhouette Continents -->
+<g fill="#100305" opacity="0.94">
+  <polygon points="-8,-12 -4,-13 0,-10 -2,-6 -6,-5 -9,-8"/>
+  <polygon points="1,-11 7,-12 12,-7 10,-3 6,-2 3,-6"/>
+  <polygon points="-8,-3 -3,-2 -1,6 -5,9 -9,5 -7,0"/>
+  <polygon points="1,0 7,2 9,8 5,11 1,6"/>
+  <polygon points="7,-3 13,-2 12,4 8,3"/>
+  <polygon points="7,4 12,6 10,10 6,9"/>
+</g>
+
+<!-- Specular spherical glass reflection -->
+<ellipse cx="-5.0" cy="-5.0" rx="12.5" ry="9.5" fill="#ffffff" opacity="0.14"/>
+<circle r="17.0" fill="none" stroke="#ff2222" stroke-width="0.8" opacity="0.85"/>
+
+<!-- Crosshair Reticle Ticks -->
+<g stroke="#ff4444" stroke-width="0.8" opacity="0.95">
+  <line x1="0" y1="-21.0" x2="0" y2="-18.2"/>
+  <line x1="0" y1="18.2" x2="0" y2="21.0"/>
+  <line x1="-21.0" y1="0" x2="-18.2" y2="0"/>
+  <line x1="18.2" y1="0" x2="21.0" y2="0"/>
+</g>
+
+</svg>
