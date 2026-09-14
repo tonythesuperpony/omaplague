@@ -85,7 +85,7 @@ func _rebuild_tree():
 		if u.get("category") == current_category:
 			cat_upgrades.append(u)
 	
-	var btn_size = Vector2(150, 80)
+	var btn_size = Vector2(150, 90)
 	var cell_size = Vector2(185, 120)
 	
 	# Determine bounds of grid across all upgrades in this category
@@ -153,7 +153,7 @@ func _rebuild_tree():
 				btn.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 				btn.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 				btn.expand_icon = false
-				btn.add_theme_constant_override("icon_max_width", 36)
+				btn.add_theme_constant_override("icon_max_width", 48)
 				btn.add_theme_constant_override("icon_margin_left", 0)
 				btn.add_theme_constant_override("icon_margin_right", 0)
 		
