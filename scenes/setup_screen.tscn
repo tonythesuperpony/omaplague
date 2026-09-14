@@ -18,13 +18,8 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
-[node name="SetupScreen" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="SetupScreen" type="CanvasLayer"]
+layer = 15
 script = ExtResource("1_setup")
 
 [node name="BG" type="Panel" parent="."]

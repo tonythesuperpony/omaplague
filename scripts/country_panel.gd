@@ -1,35 +1,43 @@
-extends PanelContainer
+extends CanvasLayer
 
 signal closed()
 
-@onready var title_label: Label = $Margin/VBox/TitleLabel
-@onready var pop_label: Label = $Margin/VBox/PopGrid/PopVal
-@onready var inf_label: Label = $Margin/VBox/PopGrid/InfVal
-@onready var dead_label: Label = $Margin/VBox/PopGrid/DeadVal
-@onready var healthy_label: Label = $Margin/VBox/PopGrid/HealthyVal
+@onready var title_label: Label = $PanelContainer/Margin/VBox/TitleLabel
+@onready var pop_label: Label = $PanelContainer/Margin/VBox/PopGrid/PopVal
+@onready var inf_label: Label = $PanelContainer/Margin/VBox/PopGrid/InfVal
+@onready var dead_label: Label = $PanelContainer/Margin/VBox/PopGrid/DeadVal
+@onready var healthy_label: Label = $PanelContainer/Margin/VBox/PopGrid/HealthyVal
 
-@onready var inf_bar: ProgressBar = $Margin/VBox/InfBar
-@onready var dead_bar: ProgressBar = $Margin/VBox/DeadBar
+@onready var inf_bar: ProgressBar = $PanelContainer/Margin/VBox/InfBar
+@onready var dead_bar: ProgressBar = $PanelContainer/Margin/VBox/DeadBar
 
-@onready var climate_label: Label = $Margin/VBox/AttrGrid/ClimateVal
-@onready var wealth_label: Label = $Margin/VBox/AttrGrid/WealthVal
-@onready var density_label: Label = $Margin/VBox/AttrGrid/DensityVal
-@onready var humidity_label: Label = $Margin/VBox/AttrGrid/HumidityVal
+@onready var climate_label: Label = $PanelContainer/Margin/VBox/AttrGrid/ClimateVal
+@onready var wealth_label: Label = $PanelContainer/Margin/VBox/AttrGrid/WealthVal
+@onready var density_label: Label = $PanelContainer/Margin/VBox/AttrGrid/DensityVal
+@onready var humidity_label: Label = $PanelContainer/Margin/VBox/AttrGrid/HumidityVal
 
-@onready var air_status: Label = $Margin/VBox/TransitHBox/AirStatus
-@onready var sea_status: Label = $Margin/VBox/TransitHBox/SeaStatus
-@onready var land_status: Label = $Margin/VBox/TransitHBox/LandStatus
+@onready var air_status: Label = $PanelContainer/Margin/VBox/TransitHBox/AirStatus
+@onready var sea_status: Label = $PanelContainer/Margin/VBox/TransitHBox/SeaStatus
+@onready var land_status: Label = $PanelContainer/Margin/VBox/TransitHBox/LandStatus
 
-@onready var btn_close: Button = $Margin/VBox/BtnClose
+@onready var btn_close: Button = $PanelContainer/Margin/VBox/BtnClose
 
 var current_country_id: String = ""
 
 func _ready():
-	btn_close.pressed.connect(func():
-		hide()
-		closed.emit()
-	)
+	btn_close.pressed.connect(close)
 	GameState.stats_updated.connect(_refresh)
+
+func _unhandled_input(event: InputEvent):
+	if visible and event is InputEventKey and event.pressed:
+		if event.keycode == KEY_ESCAPE:
+			close()
+			get_viewport().set_input_as_handled()
+
+func close():
+	hide()
+	closed.emit()
+	AudioManager.play_sfx("click")
 
 func display_country(cid: String):
 	current_country_id = cid

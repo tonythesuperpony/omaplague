@@ -1,27 +1,29 @@
-extends Control
+extends CanvasLayer
 
 signal back_requested()
 
-@onready var tab_trans: Button = $VBox/TopBar/HBox/TabTrans
-@onready var tab_symp: Button = $VBox/TopBar/HBox/TabSymp
-@onready var tab_abil: Button = $VBox/TopBar/HBox/TabAbil
-@onready var btn_back: Button = $VBox/TopBar/HBox/BtnBack
-@onready var dna_label: Label = $VBox/TopBar/HBox/DnaLabel
+@onready var root_control: Control = $Root
+@onready var tab_trans: Button = $Root/VBox/TopBar/HBox/TabTrans
+@onready var tab_symp: Button = $Root/VBox/TopBar/HBox/TabSymp
+@onready var tab_abil: Button = $Root/VBox/TopBar/HBox/TabAbil
+@onready var btn_back: Button = $Root/VBox/TopBar/HBox/BtnBack
+@onready var btn_back_bottom: Button = $Root/VBox/BottomMeters/HBox/BtnBackBottom
+@onready var dna_label: Label = $Root/VBox/TopBar/HBox/DnaLabel
 
-@onready var tree_canvas: Control = $VBox/MainArea/TreeCanvas
+@onready var tree_canvas: Control = $Root/VBox/MainArea/TreeCanvas
 
 # Details panel
-@onready var detail_name: Label = $VBox/MainArea/DetailsPanel/Margin/VBox/NameLabel
-@onready var detail_cost: Label = $VBox/MainArea/DetailsPanel/Margin/VBox/CostLabel
-@onready var detail_desc: Label = $VBox/MainArea/DetailsPanel/Margin/VBox/DescLabel
-@onready var detail_stats: Label = $VBox/MainArea/DetailsPanel/Margin/VBox/StatsLabel
-@onready var btn_evolve: Button = $VBox/MainArea/DetailsPanel/Margin/VBox/BtnEvolve
-@onready var btn_devolve: Button = $VBox/MainArea/DetailsPanel/Margin/VBox/BtnDevolve
+@onready var detail_name: Label = $Root/VBox/MainArea/DetailsPanel/Margin/VBox/NameLabel
+@onready var detail_cost: Label = $Root/VBox/MainArea/DetailsPanel/Margin/VBox/CostLabel
+@onready var detail_desc: Label = $Root/VBox/MainArea/DetailsPanel/Margin/VBox/DescLabel
+@onready var detail_stats: Label = $Root/VBox/MainArea/DetailsPanel/Margin/VBox/StatsLabel
+@onready var btn_evolve: Button = $Root/VBox/MainArea/DetailsPanel/Margin/VBox/BtnEvolve
+@onready var btn_devolve: Button = $Root/VBox/MainArea/DetailsPanel/Margin/VBox/BtnDevolve
 
 # Meters
-@onready var bar_inf: ProgressBar = $VBox/BottomMeters/HBox/InfBox/Bar
-@onready var bar_sev: ProgressBar = $VBox/BottomMeters/HBox/SevBox/Bar
-@onready var bar_let: ProgressBar = $VBox/BottomMeters/HBox/LetBox/Bar
+@onready var bar_inf: ProgressBar = $Root/VBox/BottomMeters/HBox/InfBox/Bar
+@onready var bar_sev: ProgressBar = $Root/VBox/BottomMeters/HBox/SevBox/Bar
+@onready var bar_let: ProgressBar = $Root/VBox/BottomMeters/HBox/LetBox/Bar
 
 var current_category: String = "transmission"
 var selected_upgrade_id: String = ""
@@ -32,10 +34,9 @@ func _ready():
 	tab_trans.pressed.connect(func(): _switch_tab("transmission"))
 	tab_symp.pressed.connect(func(): _switch_tab("symptom"))
 	tab_abil.pressed.connect(func(): _switch_tab("ability"))
-	btn_back.pressed.connect(func():
-		hide()
-		back_requested.emit()
-	)
+	
+	btn_back.pressed.connect(close)
+	btn_back_bottom.pressed.connect(close)
 	
 	btn_evolve.pressed.connect(_on_evolve_pressed)
 	btn_devolve.pressed.connect(_on_devolve_pressed)
@@ -45,9 +46,20 @@ func _ready():
 	
 	tree_canvas.draw.connect(_on_tree_canvas_draw)
 
+func _unhandled_input(event: InputEvent):
+	if visible and event is InputEventKey and event.pressed:
+		if event.keycode == KEY_ESCAPE or event.keycode == KEY_B:
+			close()
+			get_viewport().set_input_as_handled()
+
 func open():
 	show()
 	_switch_tab(current_category)
+
+func close():
+	hide()
+	back_requested.emit()
+	AudioManager.play_sfx("click")
 
 func _switch_tab(cat: String):
 	current_category = cat
@@ -61,7 +73,6 @@ func _switch_tab(cat: String):
 	_refresh_ui()
 
 func _rebuild_tree():
-	# Clear old buttons
 	for child in tree_canvas.get_children():
 		child.queue_free()
 	upgrade_buttons.clear()
@@ -71,7 +82,6 @@ func _rebuild_tree():
 		if u.get("category") == current_category:
 			cat_upgrades.append(u)
 			
-	# Layout nodes in tree_canvas
 	var grid_origin = Vector2(80, 50)
 	var cell_size = Vector2(170, 90)
 	
@@ -115,7 +125,6 @@ func _refresh_ui():
 		var u = DataManager.get_upgrade(uid)
 		var is_evolved = GameState.purchased_upgrades.has(uid)
 		
-		# Check if prerequisites are met
 		var can_evolve = true
 		for p in u.get("prereq", []):
 			if not GameState.purchased_upgrades.has(p):
@@ -189,7 +198,6 @@ func _on_devolve_pressed():
 		_refresh_ui()
 
 func _on_tree_canvas_draw():
-	# Draw connecting prerequisite lines
 	for uid in upgrade_buttons:
 		var u = DataManager.get_upgrade(uid)
 		var btn = upgrade_buttons[uid]

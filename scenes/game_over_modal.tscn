@@ -14,7 +14,11 @@ corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
-[node name="GameOverModal" type="PanelContainer"]
+[node name="GameOverModal" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_modal")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
 custom_minimum_size = Vector2(480, 420)
 anchors_preset = 8
 anchor_left = 0.5
@@ -28,30 +32,29 @@ offset_bottom = 210.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_box")
-script = ExtResource("1_modal")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="Margin" type="MarginContainer" parent="PanelContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 30
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 30
 theme_override_constants/margin_bottom = 24
 
-[node name="VBox" type="VBoxContainer" parent="Margin"]
+[node name="VBox" type="VBoxContainer" parent="PanelContainer/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="TitleLabel" type="Label" parent="Margin/VBox"]
+[node name="TitleLabel" type="Label" parent="PanelContainer/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
 theme_override_font_sizes/font_size = 22
 text = "HUMAN EXTINCTION"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="Margin/VBox"]
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/Margin/VBox"]
 layout_mode = 2
 
-[node name="ReasonLabel" type="Label" parent="Margin/VBox"]
+[node name="ReasonLabel" type="Label" parent="PanelContainer/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.9, 0.95, 1)
 theme_override_font_sizes/font_size = 14
@@ -59,7 +62,7 @@ text = "Humanity has been completely wiped out."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="StatsLabel" type="Label" parent="Margin/VBox"]
+[node name="StatsLabel" type="Label" parent="PanelContainer/Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 1)
@@ -72,7 +75,7 @@ Final Cure Progress: 42%
 Total DNA Harvested: 180"
 autowrap_mode = 2
 
-[node name="BtnRestart" type="Button" parent="Margin/VBox"]
+[node name="BtnRestart" type="Button" parent="PanelContainer/Margin/VBox"]
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16

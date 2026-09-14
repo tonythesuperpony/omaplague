@@ -1,11 +1,11 @@
-extends PanelContainer
+extends CanvasLayer
 
 signal restart_requested()
 
-@onready var title_label: Label = $Margin/VBox/TitleLabel
-@onready var reason_label: Label = $Margin/VBox/ReasonLabel
-@onready var stats_label: Label = $Margin/VBox/StatsLabel
-@onready var btn_restart: Button = $Margin/VBox/BtnRestart
+@onready var title_label: Label = $PanelContainer/Margin/VBox/TitleLabel
+@onready var reason_label: Label = $PanelContainer/Margin/VBox/ReasonLabel
+@onready var stats_label: Label = $PanelContainer/Margin/VBox/StatsLabel
+@onready var btn_restart: Button = $PanelContainer/Margin/VBox/BtnRestart
 
 func _ready():
 	hide()

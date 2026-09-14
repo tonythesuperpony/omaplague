@@ -1,9 +1,21 @@
-[gd_scene load_steps=7 format=3 uid="uid://cevolscreen123"]
+[gd_scene load_steps=8 format=3 uid="uid://cevolscreen123"]
 
 [ext_resource type="Script" path="res://scripts/evolution_screen.gd" id="1_evol"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.04, 0.06, 0.1, 0.98)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_back"]
+bg_color = Color(0.8, 0.2, 0.2, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.6, 0.6, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_details"]
 bg_color = Color(0.07, 0.1, 0.16, 0.95)
@@ -19,16 +31,19 @@ bg_color = Color(0.95, 0.65, 0.1, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_let_meter"]
 bg_color = Color(0.85, 0.1, 0.1, 1)
 
-[node name="EvolutionScreen" type="Control"]
+[node name="EvolutionScreen" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_evol")
+
+[node name="Root" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_evol")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="Root"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,7 +52,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="VBox" type="VBoxContainer" parent="Root"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -46,39 +61,39 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 0
 
-[node name="TopBar" type="PanelContainer" parent="VBox"]
-custom_minimum_size = Vector2(0, 54)
+[node name="TopBar" type="PanelContainer" parent="Root/VBox"]
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 
-[node name="HBox" type="HBoxContainer" parent="VBox/TopBar"]
+[node name="HBox" type="HBoxContainer" parent="Root/VBox/TopBar"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="VSeparator" type="VSeparator" parent="VBox/TopBar/HBox"]
+[node name="VSeparator" type="VSeparator" parent="Root/VBox/TopBar/HBox"]
 layout_mode = 2
 
-[node name="TabTrans" type="Button" parent="VBox/TopBar/HBox"]
+[node name="TabTrans" type="Button" parent="Root/VBox/TopBar/HBox"]
 custom_minimum_size = Vector2(160, 42)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 15
 text = "TRANSMISSION"
 
-[node name="TabSymp" type="Button" parent="VBox/TopBar/HBox"]
+[node name="TabSymp" type="Button" parent="Root/VBox/TopBar/HBox"]
 custom_minimum_size = Vector2(160, 42)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 15
 text = "SYMPTOMS"
 
-[node name="TabAbil" type="Button" parent="VBox/TopBar/HBox"]
+[node name="TabAbil" type="Button" parent="Root/VBox/TopBar/HBox"]
 custom_minimum_size = Vector2(160, 42)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 15
 text = "ABILITIES"
 
-[node name="DnaLabel" type="Label" parent="VBox/TopBar/HBox"]
+[node name="DnaLabel" type="Label" parent="Root/VBox/TopBar/HBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.7, 0.2, 1)
@@ -87,104 +102,105 @@ text = "DNA Points: 10"
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="BtnBack" type="Button" parent="VBox/TopBar/HBox"]
-custom_minimum_size = Vector2(140, 42)
+[node name="BtnBack" type="Button" parent="Root/VBox/TopBar/HBox"]
+custom_minimum_size = Vector2(180, 44)
 layout_mode = 2
 size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_back")
 theme_override_font_sizes/font_size = 15
-text = "BACK TO MAP"
+text = "[X] BACK TO MAP (ESC)"
 
-[node name="VSeparator2" type="VSeparator" parent="VBox/TopBar/HBox"]
+[node name="VSeparator2" type="VSeparator" parent="Root/VBox/TopBar/HBox"]
 layout_mode = 2
 
-[node name="MainArea" type="HBoxContainer" parent="VBox"]
+[node name="MainArea" type="HBoxContainer" parent="Root/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 0
 
-[node name="TreeCanvas" type="Control" parent="VBox/MainArea"]
+[node name="TreeCanvas" type="Control" parent="Root/VBox/MainArea"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="DetailsPanel" type="PanelContainer" parent="VBox/MainArea"]
+[node name="DetailsPanel" type="PanelContainer" parent="Root/VBox/MainArea"]
 custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_details")
 
-[node name="Margin" type="MarginContainer" parent="VBox/MainArea/DetailsPanel"]
+[node name="Margin" type="MarginContainer" parent="Root/VBox/MainArea/DetailsPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="VBox" type="VBoxContainer" parent="VBox/MainArea/DetailsPanel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Root/VBox/MainArea/DetailsPanel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="NameLabel" type="Label" parent="VBox/MainArea/DetailsPanel/Margin/VBox"]
+[node name="NameLabel" type="Label" parent="Root/VBox/MainArea/DetailsPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
 theme_override_font_sizes/font_size = 20
 text = "SELECT A MUTATION"
 
-[node name="CostLabel" type="Label" parent="VBox/MainArea/DetailsPanel/Margin/VBox"]
+[node name="CostLabel" type="Label" parent="Root/VBox/MainArea/DetailsPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.7, 0.2, 1)
 theme_override_font_sizes/font_size = 16
 text = "Cost: 10 DNA"
 
-[node name="DescLabel" type="Label" parent="VBox/MainArea/DetailsPanel/Margin/VBox"]
+[node name="DescLabel" type="Label" parent="Root/VBox/MainArea/DetailsPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.85, 0.9, 1)
 theme_override_font_sizes/font_size = 14
 text = "Select any trait node from the tree to view its bio-stats and evolve it."
 autowrap_mode = 2
 
-[node name="StatsLabel" type="Label" parent="VBox/MainArea/DetailsPanel/Margin/VBox"]
+[node name="StatsLabel" type="Label" parent="Root/VBox/MainArea/DetailsPanel/Margin/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.9, 0.7, 1)
 theme_override_font_sizes/font_size = 14
 text = "Stats: +5% Infectivity"
 
-[node name="Spacer" type="Control" parent="VBox/MainArea/DetailsPanel/Margin/VBox"]
+[node name="Spacer" type="Control" parent="Root/VBox/MainArea/DetailsPanel/Margin/VBox"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="BtnEvolve" type="Button" parent="VBox/MainArea/DetailsPanel/Margin/VBox"]
+[node name="BtnEvolve" type="Button" parent="Root/VBox/MainArea/DetailsPanel/Margin/VBox"]
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "EVOLVE TRAIT"
 
-[node name="BtnDevolve" type="Button" parent="VBox/MainArea/DetailsPanel/Margin/VBox"]
+[node name="BtnDevolve" type="Button" parent="Root/VBox/MainArea/DetailsPanel/Margin/VBox"]
 visible = false
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "DEVOLVE TRAIT (+2 DNA)"
 
-[node name="BottomMeters" type="PanelContainer" parent="VBox"]
+[node name="BottomMeters" type="PanelContainer" parent="Root/VBox"]
 custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 
-[node name="HBox" type="HBoxContainer" parent="VBox/BottomMeters"]
+[node name="HBox" type="HBoxContainer" parent="Root/VBox/BottomMeters"]
 layout_mode = 2
-theme_override_constants/separation = 40
+theme_override_constants/separation = 28
 alignment = 1
 
-[node name="InfBox" type="HBoxContainer" parent="VBox/BottomMeters/HBox"]
-custom_minimum_size = Vector2(260, 0)
+[node name="InfBox" type="HBoxContainer" parent="Root/VBox/BottomMeters/HBox"]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Label" type="Label" parent="VBox/BottomMeters/HBox/InfBox"]
+[node name="Label" type="Label" parent="Root/VBox/BottomMeters/HBox/InfBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.2, 0.5, 1)
 theme_override_font_sizes/font_size = 14
 text = "INFECTIVITY"
 
-[node name="Bar" type="ProgressBar" parent="VBox/BottomMeters/HBox/InfBox"]
+[node name="Bar" type="ProgressBar" parent="Root/VBox/BottomMeters/HBox/InfBox"]
 custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -192,18 +208,18 @@ size_flags_vertical = 4
 theme_override_styles/fill = SubResource("StyleBoxFlat_inf_meter")
 show_percentage = false
 
-[node name="SevBox" type="HBoxContainer" parent="VBox/BottomMeters/HBox"]
-custom_minimum_size = Vector2(260, 0)
+[node name="SevBox" type="HBoxContainer" parent="Root/VBox/BottomMeters/HBox"]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Label" type="Label" parent="VBox/BottomMeters/HBox/SevBox"]
+[node name="Label" type="Label" parent="Root/VBox/BottomMeters/HBox/SevBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.65, 0.1, 1)
 theme_override_font_sizes/font_size = 14
 text = "SEVERITY"
 
-[node name="Bar" type="ProgressBar" parent="VBox/BottomMeters/HBox/SevBox"]
+[node name="Bar" type="ProgressBar" parent="Root/VBox/BottomMeters/HBox/SevBox"]
 custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -211,21 +227,29 @@ size_flags_vertical = 4
 theme_override_styles/fill = SubResource("StyleBoxFlat_sev_meter")
 show_percentage = false
 
-[node name="LetBox" type="HBoxContainer" parent="VBox/BottomMeters/HBox"]
-custom_minimum_size = Vector2(260, 0)
+[node name="LetBox" type="HBoxContainer" parent="Root/VBox/BottomMeters/HBox"]
+custom_minimum_size = Vector2(220, 0)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Label" type="Label" parent="VBox/BottomMeters/HBox/LetBox"]
+[node name="Label" type="Label" parent="Root/VBox/BottomMeters/HBox/LetBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.1, 0.1, 1)
 theme_override_font_sizes/font_size = 14
 text = "LETHALITY"
 
-[node name="Bar" type="ProgressBar" parent="VBox/BottomMeters/HBox/LetBox"]
+[node name="Bar" type="ProgressBar" parent="Root/VBox/BottomMeters/HBox/LetBox"]
 custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 theme_override_styles/fill = SubResource("StyleBoxFlat_let_meter")
 show_percentage = false
+
+[node name="BtnBackBottom" type="Button" parent="Root/VBox/BottomMeters/HBox"]
+custom_minimum_size = Vector2(160, 38)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_back")
+theme_override_font_sizes/font_size = 14
+text = "RETURN TO MAP"

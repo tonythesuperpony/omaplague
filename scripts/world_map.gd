@@ -71,11 +71,27 @@ func _build_vector_cache():
 		
 	print("Built vector cache for %d regions" % country_polys.size())
 
+var is_interactive: bool = false
+
+func set_interactive(state: bool):
+	is_interactive = state
+	if not is_interactive and hovered_country_id != "":
+		hovered_country_id = ""
+		country_unhovered.emit()
+		queue_redraw()
+
 func _process(delta: float):
 	pulse_time += delta
 	queue_redraw()
 
 func _input(event: InputEvent):
+	if not is_interactive:
+		if hovered_country_id != "":
+			hovered_country_id = ""
+			country_unhovered.emit()
+			queue_redraw()
+		return
+
 	# Pan with right mouse or middle click
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_RIGHT or event.button_index == MOUSE_BUTTON_MIDDLE:
