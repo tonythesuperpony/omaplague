@@ -55,7 +55,7 @@ var funny_index: int = 0
 # Breaking News State
 var breaking_text: String = ""
 var breaking_x: float = 0.0
-var breaking_speed: float = 105.0
+var breaking_speed: float = 240.0
 
 var funny_news_pool: Array[String] = [
 	# Tony the Pony (Creator of Omaplague)
@@ -361,7 +361,9 @@ func _set_badge_breaking():
 		sb.border_color = Color(0.95, 0.3, 0.3, 0.9)
 
 func _on_news_added(headline: String):
-	breaking_queue.append(headline)
+	# Cap the queue so a burst of infections doesn't lock the ticker in breaking mode
+	if breaking_queue.size() < 3:
+		breaking_queue.append(headline)
 	if current_news_mode == NewsMode.NORMAL_MARQUEE:
 		_start_next_breaking_news()
 

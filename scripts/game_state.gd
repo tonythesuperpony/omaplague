@@ -618,7 +618,12 @@ func _check_milestones():
 		news_added.emit("Global death toll from %s passes 1 Million." % disease_name)
 
 func _check_game_over_conditions():
-	if world_dead >= world_population:
+	# Win: everyone is dead, OR everyone is dead/infected with no healthy people left
+	var total_gone = world_dead + world_infected
+	var no_healthy_left = (total_gone >= world_population)
+	# Also win if 99.9% are gone and all countries are infected (avoids floating-point never reaching exact total)
+	var effectively_wiped = (world_dead >= world_population * 0.999)
+	if no_healthy_left or effectively_wiped:
 		trigger_victory()
 	elif world_infected == 0 and world_dead > 0 and day_count > 10:
 		trigger_defeat("The pathogen has died out with no remaining hosts.")
