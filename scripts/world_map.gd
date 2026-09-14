@@ -29,7 +29,6 @@ const MAP_HEIGHT: float = 960.0
 var is_interactive: bool = false
 
 # Textures
-var map_texture: Texture2D
 var icon_plane: Texture2D
 var icon_anchor: Texture2D
 
@@ -37,20 +36,14 @@ var icon_anchor: Texture2D
 var ambient_timer: float = 0.0
 const AMBIENT_INTERVAL: float = 0.85
 
-# Scenic transit routes (sampled quadratic beziers)
-var scenic_transit_lines: Array[Array] = []
-
 func _ready():
 	# Load textures
-	if ResourceLoader.exists("res://assets/world_map_realistic.png"):
-		map_texture = load("res://assets/world_map_realistic.png")
 	if ResourceLoader.exists("res://assets/icons/airplane.png"):
 		icon_plane = load("res://assets/icons/airplane.png")
 	if ResourceLoader.exists("res://assets/icons/anchor.png"):
 		icon_anchor = load("res://assets/icons/anchor.png")
 		
 	_build_vector_cache()
-	_build_scenic_routes()
 	
 	GameState.plane_dispatched.connect(_on_plane_dispatched)
 	GameState.ship_dispatched.connect(_on_ship_dispatched)
@@ -92,50 +85,6 @@ func _build_vector_cache():
 		country_bounds[cid] = Rect2(min_x, min_y, max_x - min_x, max_y - min_y)
 		
 	print("Built vector cache for %d countries" % country_polys.size())
-
-func _build_scenic_routes():
-	scenic_transit_lines.clear()
-	var raw_beziers = [
-		# North Atlantic (New York to London)
-		[Vector2(432, 269), Vector2(688, 170), Vector2(946, 193)],
-		# Transatlantic South (Brazil to Lisbon)
-		[Vector2(677, 538), Vector2(850, 420), Vector2(930, 260)],
-		# South Atlantic (Brazil to Cape Town)
-		[Vector2(677, 538), Vector2(880, 680), Vector2(1094, 635)],
-		# Cape Town to Mumbai (Indian Ocean)
-		[Vector2(1094, 635), Vector2(1250, 560), Vector2(1385, 358)],
-		# Cape Town to Sydney (Southern Ocean)
-		[Vector2(1094, 635), Vector2(1380, 720), Vector2(1677, 616)],
-		# Mediterranean to Red Sea / Egypt
-		[Vector2(930, 260), Vector2(1020, 300), Vector2(1119, 339)],
-		# Egypt to Mumbai (Arabian Sea)
-		[Vector2(1119, 339), Vector2(1240, 380), Vector2(1385, 358)],
-		# Mumbai to Singapore (Bay of Bengal)
-		[Vector2(1385, 358), Vector2(1440, 450), Vector2(1510, 460)],
-		# Singapore to Tokyo (East Asia)
-		[Vector2(1510, 460), Vector2(1580, 370), Vector2(1690, 288)],
-		# Singapore to Sydney
-		[Vector2(1510, 460), Vector2(1600, 520), Vector2(1677, 616)],
-		# Sydney to New Zealand
-		[Vector2(1677, 616), Vector2(1780, 670), Vector2(1869, 715)],
-		# South America Cape Horn
-		[Vector2(650, 680), Vector2(620, 780), Vector2(580, 680)],
-		# Caribbean to Panama
-		[Vector2(460, 300), Vector2(480, 380), Vector2(500, 450)],
-		# Panama to Lima/Chile
-		[Vector2(500, 450), Vector2(520, 540), Vector2(580, 680)],
-	]
-	for bez in raw_beziers:
-		var pts: Array[Vector2] = []
-		var p0 = bez[0]
-		var p1 = bez[1]
-		var p2 = bez[2]
-		for step in range(25):
-			var t = float(step) / 24.0
-			var q0 = p0.lerp(p1, t)
-			var q1 = p1.lerp(p2, t)
-			pts.append(q0.lerp(q1, t))
-		scenic_transit_lines.append(pts)
 
 func set_interactive(state: bool):
 	is_interactive = state
